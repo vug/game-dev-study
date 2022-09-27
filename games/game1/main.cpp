@@ -5,6 +5,7 @@
 #include <cassert>
 #include <iostream>
 #include <random>
+#include <string>
 #include <vector>
 
 const int SIZE = 800;
@@ -63,7 +64,7 @@ private:
 	Direction dir;
 
 public:
-	Snake(Cell head, uint32_t length, Direction dir) 
+	Snake(Cell head, uint32_t length, Direction dir)
 		: dir{ dir } {
 		Cell cell = head;
 		for (int i = 0; i < length; ++i) {
@@ -115,10 +116,11 @@ class Game {
 
 private:
 	State state = State::Menu;
-	int32_t gridSize = 3;
+	int32_t gridSize{ 3 };
 	SDL_Keycode lastKey;
 	Snake snake;
 	Cell apple;
+	uint32_t score{};
 	std::mt19937 rnd = std::mt19937{ std::random_device{}() };
 
 public:
@@ -137,7 +139,7 @@ public:
 		std::vector<Cell> out; // a vector, not a single cell because of std::sample API
 		const int32_t numCells = gridSize * gridSize;
 		for (int32_t i = 0; i < numCells; ++i) {
-			Cell cell{ i % gridSize , i / gridSize};
+			Cell cell{ i % gridSize , i / gridSize };
 			if (!snake.hasCell(cell))
 				availableCells.push_back(cell);
 		}
@@ -149,10 +151,12 @@ public:
 		apple = out[0];
 	}
 
-	void render(SDL_Renderer* gRenderer) {
-		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	void render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
+		// Clear
+		SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
 		SDL_RenderClear(gRenderer);
 
+		// Render Game Area
 		const float rectSide = static_cast<float>(SIZE) / gridSize;
 
 		{
@@ -166,16 +170,32 @@ public:
 			const SDL_FRect rect = { cell.x * rectSide, cell.y * rectSide, rectSide, rectSide };
 			SDL_RenderFillRectF(gRenderer, &rect);
 		}
+
+		// Render texts such as score
+		{
+			std::string text = "score: " + std::to_string(score);
+			//SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, text.c_str(), SDL_Color{ 0xCC, 0xCC, 0xCC });   // aliased glyphs
+			SDL_Surface* textSurface = TTF_RenderText_Blended(gFont, text.c_str(), SDL_Color{ 0xCC, 0xCC, 0xCC });   // anti-aliased glyphs
+			if (textSurface == nullptr)
+				std::cout << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError() << "\n";
+			SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+
+			int texW, texH;
+			SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
+			SDL_Rect dstrect = { 0, 0, texW, texH };
+			SDL_RenderCopy(gRenderer, texture, NULL, &dstrect);
+
+			SDL_DestroyTexture(texture);
+			SDL_FreeSurface(textSurface);
+		}
 	}
 
 	void tick() {
 		switch (lastKey) {
 		case SDLK_LEFT:
-			//std::cout << "Left\n";
 			snake.turnLeft();
 			break;
 		case SDLK_RIGHT:
-			//std::cout << "Right\n";
 			snake.turnRight();
 			break;
 		case SDLK_UNKNOWN:
@@ -191,6 +211,7 @@ public:
 		else if (nextCell.isSameAs(apple)) {
 			snake.elongate();
 			placeApple();
+			++score;
 		}
 		else
 			snake.move();
@@ -199,9 +220,15 @@ public:
 
 int main(int argc, char* args[]) {
 	SDL_Init(SDL_INIT_VIDEO);
+	TTF_Init();
 	SDL_Window* gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SIZE, SIZE, SDL_WINDOW_SHOWN);
-	SDL_Surface* gScreenSurface = SDL_GetWindowSurface(gWindow);
+	//SDL_Surface* gScreenSurface = SDL_GetWindowSurface(gWindow);
 	SDL_Renderer* gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+	const char* fontFile = "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
+	TTF_Font* gFont = TTF_OpenFont(fontFile, 28);
+	if (gFont == nullptr)
+		std::cout << "font not found! " << TTF_GetError() << "\n";
+	TTF_SetFontStyle(gFont, TTF_STYLE_NORMAL);
 
 	SDL_UpdateWindowSurface(gWindow);
 	SDL_Event e;
@@ -226,11 +253,13 @@ int main(int argc, char* args[]) {
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0xFF, 0xFF);
 		SDL_RenderClear(gRenderer);
 
-		game.render(gRenderer);
+		game.render(gRenderer, gFont);
 
 		SDL_RenderPresent(gRenderer);
 	}
 
+	TTF_CloseFont(gFont);
+	TTF_Quit();
 	SDL_DestroyRenderer(gRenderer);
 	SDL_DestroyWindow(gWindow);
 	SDL_Quit();
