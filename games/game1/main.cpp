@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 #include <algorithm>
 #include <cassert>
@@ -108,7 +109,12 @@ public:
 };
 
 class Game {
+	enum class State {
+		Menu = 0, Playing, Pause, GameOver, Win
+	};
+
 private:
+	State state = State::Menu;
 	int32_t gridSize = 3;
 	SDL_Keycode lastKey;
 	Snake snake;

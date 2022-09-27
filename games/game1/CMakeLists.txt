@@ -3,7 +3,8 @@ add_executable(Game1
 
 target_link_libraries(
   Game1 PRIVATE
-  ${SDL2_LIBRARIES}
+  SDL2::SDL2main SDL2::SDL2
+  SDL2_ttf::SDL2_ttf
 )
 
 target_compile_features(Game1 PRIVATE cxx_std_20)
@@ -20,6 +21,13 @@ add_custom_command(
     TARGET Game1 POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     $<TARGET_FILE:SDL2::SDL2>
+    $<TARGET_FILE_DIR:Game1>
+    VERBATIM)
+
+add_custom_command(
+    TARGET Game1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    $<TARGET_FILE:SDL2_ttf::SDL2_ttf>
     $<TARGET_FILE_DIR:Game1>
     VERBATIM)
 endif()
