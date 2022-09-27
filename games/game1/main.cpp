@@ -22,8 +22,8 @@ enum class Direction {
 
 class Cell {
 public:
-	int x{};
-	int y{};
+	int32_t x{};
+	int32_t y{};
 
 public:
 	static Cell deltaCell(Direction dir) {
@@ -36,9 +36,8 @@ public:
 			return Cell{ 0, -1 };
 		case Direction::LEFT:
 			return Cell{ -1, 0 };
-		default:
-			assert(false); // unknown direction
 		}
+		assert(false); // unknown direction
 	}
 
 	Cell addCell(const Cell& other) const {
@@ -57,50 +56,69 @@ public:
 
 
 class Snake {
+private:
 	// from head to tail
 	std::vector<Cell> cells;
 	Direction dir;
+
 public:
-	Snake() // TODO: take gridSize as argument to place it at the center
-		: cells{ Cell{5, 5}, Cell{6, 5}, Cell{7, 5}, Cell{8,5}, Cell{9,5} }, dir{ Direction::LEFT } {}
+	Snake(Cell head, uint32_t length, Direction dir) 
+		: dir{ dir } {
+		Cell cell = head;
+		for (int i = 0; i < length; ++i) {
+			cells.push_back(cell);
+			cell = cell.addCell(Cell::deltaCell(dir));
+		}
+	}
+
 	const std::vector<Cell>& getCells() const { return cells; }
+
+	const Cell& getHead() const { return cells[0]; }
+	const Cell& getTail() const { return cells.back(); }
+
 	// signs are opposite because the rendering surface is upside-down
 	void turnRight() { dir = static_cast<Direction>(positiveModulus(static_cast<int>(dir) - 1, 4)); }
 	void turnLeft() { dir = static_cast<Direction>(positiveModulus(static_cast<int>(dir) + 1, 4)); }
+
+	Cell getNextCell() {
+		return getHead().addCell(Cell::deltaCell(dir));
+	}
+
 	void move() {
 		for (size_t ix = cells.size() - 1; ix > 0; --ix)
 			cells[ix] = cells[ix - 1];
 		const Cell dc = Cell::deltaCell(dir);
 		cells[0] = cells[0].addCell(dc);
 	}
+
+	void elongate() {
+		cells.insert(cells.begin(), getNextCell());
+	}
+
 	bool hasCell(const Cell& other) {
-		bool result = false;
 		for (const Cell& cell : cells)
 			if (cell.isSameAs(other))
-				result = true;
-		return true;
-	}
-	bool hasBitItself() {
-		const Cell& head = cells[0];
-		for (size_t ix = 1; ix < cells.size(); ++ix) {
-			const Cell& other = cells[ix];
-			if (head.isSameAs(other))
 				return true;
-		}
 		return false;
+	}
+
+	bool willBiteItself(const Cell& nextCell) {
+		return hasCell(nextCell) && !nextCell.isSameAs(getTail());
 	}
 };
 
 class Game {
 private:
-	uint32_t gridSize = 10;
+	int32_t gridSize = 3;
 	SDL_Keycode lastKey;
 	Snake snake;
 	Cell apple;
 	std::mt19937 rnd = std::mt19937{ std::random_device{}() };
 
 public:
-	Game() : lastKey{ SDLK_UNKNOWN } {
+	Game() : lastKey{ SDLK_UNKNOWN }, snake{ Cell{gridSize / 2, gridSize / 2}, 2, Direction::LEFT } {
+		for (const Cell& cell : snake.getCells())
+			assert(!cell.isAtGridWalls(gridSize));
 		placeApple();
 	}
 
@@ -109,13 +127,17 @@ public:
 	}
 
 	void placeApple() {
-		std::vector<Cell> availableCells;
+		std::vector<Cell> availableCells{};
 		std::vector<Cell> out; // a vector, not a single cell because of std::sample API
-		const int numCells = gridSize * gridSize;
-		for (int i = 0; i < numCells; ++i) {
+		const int32_t numCells = gridSize * gridSize;
+		for (int32_t i = 0; i < numCells; ++i) {
 			Cell cell{ i % gridSize , i / gridSize};
-			if (snake.hasCell(cell))
+			if (!snake.hasCell(cell))
 				availableCells.push_back(cell);
+		}
+		if (availableCells.size() == 0) {
+			std::cout << "CONGRATULATIONS: Longest snake!\n";
+			return;
 		}
 		std::sample(availableCells.begin(), availableCells.end(), std::back_inserter(out), 1, rnd);
 		apple = out[0];
@@ -150,19 +172,22 @@ public:
 			//std::cout << "Right\n";
 			snake.turnRight();
 			break;
+		case SDLK_UNKNOWN:
+			break;
 		}
 		lastKey = SDLK_UNKNOWN;
 
-		snake.move();
-		const Cell& head = snake.getCells()[0];
-		if (head.isAtGridWalls(gridSize))
+		const Cell& nextCell = snake.getNextCell();
+		if (nextCell.isAtGridWalls(gridSize))
 			std::cout << "GAME OVER: snake hit wall\n";
-		else if (snake.hasBitItself())
+		else if (snake.willBiteItself(nextCell))
 			std::cout << "GAME OVER: snake bit itself\n";
-		else if (snake.getCells()[0].isSameAs(apple)) {
-			// 
+		else if (nextCell.isSameAs(apple)) {
+			snake.elongate();
 			placeApple();
 		}
+		else
+			snake.move();
 	}
 };
 
