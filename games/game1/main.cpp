@@ -116,12 +116,14 @@ class Game {
 
 private:
 	State state = State::Menu;
-	int32_t gridSize{ 3 };
+	int32_t gridSize{ 15 };
 	SDL_Keycode lastKey;
 	Snake snake;
 	Cell apple;
 	uint32_t score{};
 	std::mt19937 rnd = std::mt19937{ std::random_device{}() };
+public:
+	int period = 200;
 
 public:
 	Game() : lastKey{ SDLK_UNKNOWN }, snake{ Cell{gridSize / 2, gridSize / 2}, 2, Direction::LEFT } {
@@ -221,10 +223,10 @@ public:
 int main(int argc, char* args[]) {
 	SDL_Init(SDL_INIT_VIDEO);
 	TTF_Init();
-	SDL_Window* gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SIZE, SIZE, SDL_WINDOW_SHOWN);
+	SDL_Window* gWindow = SDL_CreateWindow("Snake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SIZE, SIZE, SDL_WINDOW_SHOWN);
 	//SDL_Surface* gScreenSurface = SDL_GetWindowSurface(gWindow);
 	SDL_Renderer* gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
-	const char* fontFile = "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
+	const char* fontFile = "assets/fonts/enter_command/EnterCommand.ttf"; // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
 	TTF_Font* gFont = TTF_OpenFont(fontFile, 28);
 	if (gFont == nullptr)
 		std::cout << "font not found! " << TTF_GetError() << "\n";
@@ -245,7 +247,7 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		if (SDL_GetTicks() - time > 200) {
+		if (SDL_GetTicks() - time > game.period) {
 			game.tick();
 			time = SDL_GetTicks();
 		}
