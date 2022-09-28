@@ -132,8 +132,9 @@ public:
 		placeApple();
 	}
 
-	void keyPressed(SDL_Keycode key) {
-		lastKey = key;
+	void handleEvent(const SDL_Event& e) {
+		if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
+			lastKey = e.key.keysym.sym;
 	}
 
 	void placeApple() {
@@ -242,9 +243,8 @@ int main(int argc, char* args[]) {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT)
 				quit = true;
-			else if (e.type == SDL_KEYDOWN && e.key.repeat == 0) {
-				game.keyPressed(e.key.keysym.sym);
-			}
+			else
+				game.handleEvent(e);
 		}
 
 		if (SDL_GetTicks() - time > game.period) {
