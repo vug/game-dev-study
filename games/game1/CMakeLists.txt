@@ -1,5 +1,5 @@
 add_executable(Game1
-  main.cpp)
+  Snake.cpp GameStates.cpp main.cpp)
 
 target_link_libraries(
   Game1 PRIVATE
