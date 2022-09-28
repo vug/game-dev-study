@@ -109,12 +109,57 @@ public:
 	}
 };
 
+enum class StateID
+{
+	Menu, Playing
+};
+
 class State {
 public:
 	virtual void handleEvent(const SDL_Event& e) = 0;
-	virtual State* update(uint32_t deltaTime) = 0;
+	virtual StateID update(uint32_t deltaTime) = 0;
 	virtual void render(SDL_Renderer* gRenderer, TTF_Font* gFont) = 0;
 	virtual ~State() = default;
+};
+
+class MenuState : public State {
+private:
+	SDL_Keycode lastKey;
+
+public:
+	void handleEvent(const SDL_Event& e) final {
+		if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
+			lastKey = e.key.keysym.sym;
+	}
+
+	StateID update(uint32_t deltaTime) final {
+		StateID result = StateID::Menu;
+		if (lastKey == SDLK_SPACE)
+			result = StateID::Playing;
+		lastKey = SDLK_UNKNOWN;
+
+		return result;
+	}
+
+	void render(SDL_Renderer* gRenderer, TTF_Font* gFont) final {
+		SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
+		SDL_RenderClear(gRenderer);
+
+		// Render texts such as score
+		{
+			std::string text = "Hungry Snake";
+			SDL_Surface* textSurface = TTF_RenderText_Blended(gFont, text.c_str(), SDL_Color{ 0xCC, 0x22, 0x33 });   // anti-aliased glyphs
+			SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+
+			int texW, texH;
+			SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
+			SDL_Rect dstrect = { SIZE / 2, SIZE / 2, texW, texH };
+			SDL_RenderCopy(gRenderer, texture, NULL, &dstrect);
+
+			SDL_DestroyTexture(texture);
+			SDL_FreeSurface(textSurface);
+		}
+	}
 };
 
 class PlayingState : public State {
@@ -137,7 +182,7 @@ public:
 		placeApple();
 	}
 
-	void handleEvent(const SDL_Event& e)  final{
+	void handleEvent(const SDL_Event& e)  final {
 		if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
 			lastKey = e.key.keysym.sym;
 	}
@@ -198,10 +243,10 @@ public:
 		}
 	}
 
-	State* update(uint32_t deltaTime) final {
+	StateID update(uint32_t deltaTime) final {
 		timer += deltaTime;
 		if (timer < period)
-			return this;
+			return StateID::Playing;
 		timer -= period;
 
 		switch (lastKey) {
@@ -229,13 +274,15 @@ public:
 		else
 			snake.move();
 
-		return this;
+		return StateID::Playing;
 	}
 };
 
+
 class Game {
-public:
+private:
 	PlayingState playingState;
+	MenuState menuState;
 	State* state;
 public:
 	void run() {
@@ -254,7 +301,7 @@ public:
 		SDL_Event e;
 		bool quit = false;
 
-		state = &playingState;
+		state = &menuState;
 		uint32_t time = SDL_GetTicks();
 		while (!quit) {
 			while (SDL_PollEvent(&e)) {
@@ -266,7 +313,18 @@ public:
 
 			uint32_t deltaTime = SDL_GetTicks() - time;
 			time = SDL_GetTicks();
-			state = state->update(deltaTime);
+			// State Manager
+			StateID nextStateID = state->update(deltaTime);
+			switch (nextStateID) {
+			case StateID::Menu:
+				state = &menuState;
+				break;
+			case StateID::Playing:
+				state = &playingState;
+				break;
+			default:
+				assert(false); // unknown state
+			}
 
 			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0xFF, 0xFF);
 			SDL_RenderClear(gRenderer);
