@@ -7,7 +7,7 @@
 
 const int SIZE = 800;
 
-void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Renderer* renderer, TTF_Font* font) {
+void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Renderer* renderer, TTF_Font* font, bool center=false) {
 	SDL_Surface* textSurface = TTF_RenderText_Blended(font, text.c_str(), color);   // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs
 	if (textSurface == nullptr)
 		std::cerr << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError() << "\n";
@@ -15,7 +15,7 @@ void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Rend
 
 	int texW, texH;
 	SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
-	SDL_Rect dstrect = { x, y, texW, texH };
+	SDL_Rect dstrect = center ? SDL_Rect{x - texW / 2, y - texH / 2, texW, texH} : SDL_Rect{x, y, texW, texH};
 	SDL_RenderCopy(renderer, texture, NULL, &dstrect);
 
 	SDL_DestroyTexture(texture);
@@ -44,7 +44,11 @@ void MenuState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
 	SDL_RenderClear(gRenderer);
 
-	renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont);
+	renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
+	renderText("Press SPACE to start...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, gRenderer, gFont, true);
+	renderText("LEFT ARROW turns the snake to the left", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 120, gRenderer, gFont, true);
+	renderText("RIGHT ARROW turns the snake to the right", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 90, gRenderer, gFont, true);
+	renderText("P pauses the game", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 60, gRenderer, gFont, true);
 }
 
 
@@ -177,7 +181,7 @@ void PauseState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
 
 	// Pause rendering specific draw calls
-	renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont);
+	renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
 }
 
 //------------- StateManager
