@@ -8,13 +8,15 @@
 
 #include <random>
 
-class State;
+class MenuState;
+class PlayingState;
+class PauseState;
 
 class StateManager {
 public:
-	State* menuState;
-	State* playingState;
-	State* pauseState;
+	MenuState* menuState;
+	PlayingState* playingState;
+	PauseState* pauseState;
 	StateManager();
 };
 
