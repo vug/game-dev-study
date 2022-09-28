@@ -186,5 +186,7 @@ void PauseState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 
 //------------- StateManager
 
-StateManager::StateManager()
-	: menuState(new MenuState{ *this }), playingState(new PlayingState{ *this }), pauseState(new PauseState{ *this }) {}
+StateManager::StateManager() : 
+	menuState(std::make_unique<MenuState>(*this)), 
+	playingState(std::make_unique<PlayingState>(*this)), 
+	pauseState(std::make_unique<PauseState>(*this)) {}
