@@ -24,7 +24,7 @@ void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Rend
 
 //------------- MenuState
 
-MenuState::MenuState(StateManager* stateManager) : State(stateManager) {}
+MenuState::MenuState(StateManager& stateManager) : State(stateManager) {}
 
 void MenuState::handleEvent(const SDL_Event& e) {
 	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
@@ -34,7 +34,7 @@ void MenuState::handleEvent(const SDL_Event& e) {
 State* MenuState::update(uint32_t deltaTime) {
 	State* result = this;
 	if (lastKey == SDLK_SPACE)
-		result = stateManager->playingState.get();
+		result = stateManager.playingState.get();
 	lastKey = SDLK_UNKNOWN;
 
 	return result;
@@ -55,7 +55,7 @@ void MenuState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 //------------- PlayingState
 
 
-PlayingState::PlayingState(StateManager* stateManager) : State(stateManager), lastKey{ SDLK_UNKNOWN }, snake{ Cell{gridSize / 2, gridSize / 2}, 2, Direction::LEFT } {
+PlayingState::PlayingState(StateManager& stateManager) : State(stateManager), lastKey{ SDLK_UNKNOWN }, snake{ Cell{gridSize / 2, gridSize / 2}, 2, Direction::LEFT } {
 	for (const Cell& cell : snake.getCells())
 		assert(!cell.isAtGridWalls(gridSize));
 	placeApple();
@@ -126,7 +126,7 @@ State* PlayingState::update(uint32_t deltaTime) {
 		snake.turnRight();
 		break;
 	case SDLK_p:
-		result = stateManager->pauseState.get();
+		result = stateManager.pauseState.get();
 		break;
 	case SDLK_UNKNOWN:
 		break;
@@ -153,7 +153,7 @@ State* PlayingState::update(uint32_t deltaTime) {
 //------------- PauseState
 
 
-PauseState::PauseState(StateManager* stateManager) : State(stateManager) {}
+PauseState::PauseState(StateManager& stateManager) : State(stateManager) {}
 
 void PauseState::handleEvent(const SDL_Event& e) {
 	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
@@ -163,7 +163,7 @@ void PauseState::handleEvent(const SDL_Event& e) {
 State* PauseState::update(uint32_t deltaTime) {
 	State* result = this;
 	if (lastKey == SDLK_p)
-		result = stateManager->playingState.get();
+		result = stateManager.playingState.get();
 	lastKey = SDLK_UNKNOWN;
 
 	return result;
@@ -171,7 +171,7 @@ State* PauseState::update(uint32_t deltaTime) {
 
 void PauseState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	// Render game area without evolving it
-	stateManager->playingState->render(gRenderer, gFont);
+	stateManager.playingState->render(gRenderer, gFont);
 
 	// Draw a semi-transparent fullscreen quad overlay
 	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0x55);
@@ -187,4 +187,4 @@ void PauseState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 //------------- StateManager
 
 StateManager::StateManager()
-	: menuState(new MenuState{ this }), playingState(new PlayingState{ this }), pauseState(new PauseState{ this }) {}
+	: menuState(new MenuState{ *this }), playingState(new PlayingState{ *this }), pauseState(new PauseState{ *this }) {}

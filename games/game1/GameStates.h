@@ -25,9 +25,9 @@ public:
 
 class State {
 protected:
-	StateManager* stateManager = nullptr;
+	StateManager& stateManager;
 public:
-	State(StateManager* stateManager) : stateManager(stateManager) {}
+	State(StateManager& stateManager) : stateManager(stateManager) {}
 	virtual void handleEvent(const SDL_Event& e) = 0;
 	virtual State* update(uint32_t deltaTime) = 0;
 	virtual void render(SDL_Renderer* gRenderer, TTF_Font* gFont) = 0;
@@ -39,7 +39,7 @@ private:
 	SDL_Keycode lastKey{};
 
 public:
-	MenuState(StateManager* stateManager);
+	MenuState(StateManager& stateManager);
 	void handleEvent(const SDL_Event& e) final;
 	State* update(uint32_t deltaTime) final;
 	void render(SDL_Renderer* gRenderer, TTF_Font* gFont) final;
@@ -59,7 +59,7 @@ public:
 	int period = 200;
 
 public:
-	PlayingState(StateManager* stateManager);
+	PlayingState(StateManager& stateManager);
 
 	void handleEvent(const SDL_Event& e)  final;
 
@@ -75,7 +75,7 @@ private:
 	SDL_Keycode lastKey{};
 
 public:
-	PauseState(StateManager* stateManager);
+	PauseState(StateManager& stateManager);
 
 	void handleEvent(const SDL_Event& e) final;
 
