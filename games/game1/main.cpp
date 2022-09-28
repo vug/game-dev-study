@@ -121,6 +121,7 @@ private:
 	Snake snake;
 	Cell apple;
 	uint32_t score{};
+	uint32_t timer{};
 	std::mt19937 rnd = std::mt19937{ std::random_device{}() };
 public:
 	int period = 200;
@@ -193,7 +194,12 @@ public:
 		}
 	}
 
-	void tick() {
+	void update(uint32_t deltaTime) {
+		timer += deltaTime;
+		if (timer < period)
+			return;
+		timer -= period;
+
 		switch (lastKey) {
 		case SDLK_LEFT:
 			snake.turnLeft();
@@ -247,10 +253,9 @@ int main(int argc, char* args[]) {
 				game.handleEvent(e);
 		}
 
-		if (SDL_GetTicks() - time > game.period) {
-			game.tick();
-			time = SDL_GetTicks();
-		}
+		uint32_t deltaTime = SDL_GetTicks() - time;
+		time = SDL_GetTicks();
+		game.update(deltaTime);
 
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0xFF, 0xFF);
 		SDL_RenderClear(gRenderer);
