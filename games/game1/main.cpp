@@ -14,7 +14,7 @@ const int SIZE = 800;
 class Game {
 private:
 	StateManager stateManager;
-	State* state = stateManager.menuState;
+	State* state = stateManager.menuState.get();
 public:
 	void run() {
 		SDL_Init(SDL_INIT_VIDEO);

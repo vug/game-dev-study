@@ -34,7 +34,7 @@ void MenuState::handleEvent(const SDL_Event& e) {
 State* MenuState::update(uint32_t deltaTime) {
 	State* result = this;
 	if (lastKey == SDLK_SPACE)
-		result = stateManager->playingState;
+		result = stateManager->playingState.get();
 	lastKey = SDLK_UNKNOWN;
 
 	return result;
@@ -126,7 +126,7 @@ State* PlayingState::update(uint32_t deltaTime) {
 		snake.turnRight();
 		break;
 	case SDLK_p:
-		result = stateManager->pauseState;
+		result = stateManager->pauseState.get();
 		break;
 	case SDLK_UNKNOWN:
 		break;
@@ -163,7 +163,7 @@ void PauseState::handleEvent(const SDL_Event& e) {
 State* PauseState::update(uint32_t deltaTime) {
 	State* result = this;
 	if (lastKey == SDLK_p)
-		result = stateManager->playingState;
+		result = stateManager->playingState.get();
 	lastKey = SDLK_UNKNOWN;
 
 	return result;

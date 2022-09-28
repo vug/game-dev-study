@@ -6,17 +6,19 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+#include <memory>
 #include <random>
 
+class State;
 class MenuState;
 class PlayingState;
 class PauseState;
 
 class StateManager {
 public:
-	MenuState* menuState;
-	PlayingState* playingState;
-	PauseState* pauseState;
+	std::unique_ptr<MenuState> menuState;
+	std::unique_ptr<PlayingState> playingState;
+	std::unique_ptr<PauseState> pauseState;
 	StateManager();
 };
 
