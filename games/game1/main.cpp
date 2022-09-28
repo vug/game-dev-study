@@ -18,6 +18,21 @@ int positiveModulus(int num, int mod)
 	return result;
 }
 
+void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Renderer* renderer, TTF_Font* font) {
+	SDL_Surface* textSurface = TTF_RenderText_Blended(font, text.c_str(), color);   // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs
+	if (textSurface == nullptr)
+		std::cerr << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError() << "\n";
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
+
+	int texW, texH;
+	SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
+	SDL_Rect dstrect = { x, y, texW, texH };
+	SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(textSurface);
+}
+
 enum class Direction {
 	UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3
 };
@@ -111,7 +126,7 @@ public:
 
 enum class StateID
 {
-	Menu, Playing
+	Menu, Playing, Pause
 };
 
 class State {
@@ -124,7 +139,7 @@ public:
 
 class MenuState : public State {
 private:
-	SDL_Keycode lastKey;
+	SDL_Keycode lastKey{};
 
 public:
 	void handleEvent(const SDL_Event& e) final {
@@ -145,20 +160,7 @@ public:
 		SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
 		SDL_RenderClear(gRenderer);
 
-		// Render texts such as score
-		{
-			std::string text = "Hungry Snake";
-			SDL_Surface* textSurface = TTF_RenderText_Blended(gFont, text.c_str(), SDL_Color{ 0xCC, 0x22, 0x33 });   // anti-aliased glyphs
-			SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-
-			int texW, texH;
-			SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
-			SDL_Rect dstrect = { SIZE / 2, SIZE / 2, texW, texH };
-			SDL_RenderCopy(gRenderer, texture, NULL, &dstrect);
-
-			SDL_DestroyTexture(texture);
-			SDL_FreeSurface(textSurface);
-		}
+		renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont);
 	}
 };
 
@@ -227,26 +229,16 @@ public:
 		// Render texts such as score
 		{
 			std::string text = "score: " + std::to_string(score);
-			//SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, text.c_str(), SDL_Color{ 0xCC, 0xCC, 0xCC });   // aliased glyphs
-			SDL_Surface* textSurface = TTF_RenderText_Blended(gFont, text.c_str(), SDL_Color{ 0xCC, 0xCC, 0xCC });   // anti-aliased glyphs
-			if (textSurface == nullptr)
-				std::cout << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError() << "\n";
-			SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-
-			int texW, texH;
-			SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
-			SDL_Rect dstrect = { 0, 0, texW, texH };
-			SDL_RenderCopy(gRenderer, texture, NULL, &dstrect);
-
-			SDL_DestroyTexture(texture);
-			SDL_FreeSurface(textSurface);
+			renderText(text, { 0xCC, 0xCC, 0xCC }, 0, 0, gRenderer, gFont);
 		}
 	}
 
 	StateID update(uint32_t deltaTime) final {
+		StateID result = StateID::Playing;
+
 		timer += deltaTime;
 		if (timer < period)
-			return StateID::Playing;
+			return result;
 		timer -= period;
 
 		switch (lastKey) {
@@ -255,6 +247,9 @@ public:
 			break;
 		case SDLK_RIGHT:
 			snake.turnRight();
+			break;
+		case SDLK_p:
+			result = StateID::Pause;
 			break;
 		case SDLK_UNKNOWN:
 			break;
@@ -274,15 +269,43 @@ public:
 		else
 			snake.move();
 
-		return StateID::Playing;
+		return result;
+	}
+};
+
+class PauseState : public State {
+private:
+	SDL_Keycode lastKey{};
+
+public:
+	void handleEvent(const SDL_Event& e) final {
+		if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
+			lastKey = e.key.keysym.sym;
+	}
+
+	StateID update(uint32_t deltaTime) final {
+		StateID result = StateID::Pause;
+		if (lastKey == SDLK_p)
+			result = StateID::Playing;
+		lastKey = SDLK_UNKNOWN;
+
+		return result;
+	}
+
+	void render(SDL_Renderer* gRenderer, TTF_Font* gFont) final {
+		SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
+		SDL_RenderClear(gRenderer);
+
+		renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont);
 	}
 };
 
 
 class Game {
 private:
-	PlayingState playingState;
 	MenuState menuState;
+	PlayingState playingState;
+	PauseState pauseState;
 	State* state;
 public:
 	void run() {
@@ -321,6 +344,9 @@ public:
 				break;
 			case StateID::Playing:
 				state = &playingState;
+				break;
+			case StateID::Pause:
+				state = &pauseState;
 				break;
 			default:
 				assert(false); // unknown state
