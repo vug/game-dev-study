@@ -124,12 +124,16 @@ public:
 	}
 };
 
-enum class StateID
-{
-	Menu, Playing, Pause
+class State;
+
+class StateManager {
+public:
+	State* menuState;
+	State* playingState;
+	State* pauseState;
+	StateManager();
 };
 
-class StateManager;
 
 class State {
 protected:
@@ -137,7 +141,7 @@ protected:
 public:
 	State(StateManager* stateManager) : stateManager(stateManager) {}
 	virtual void handleEvent(const SDL_Event& e) = 0;
-	virtual StateID update(uint32_t deltaTime) = 0;
+	virtual State* update(uint32_t deltaTime) = 0;
 	virtual void render(SDL_Renderer* gRenderer, TTF_Font* gFont) = 0;
 	virtual ~State() = default;
 };
@@ -153,10 +157,10 @@ public:
 			lastKey = e.key.keysym.sym;
 	}
 
-	StateID update(uint32_t deltaTime) final {
-		StateID result = StateID::Menu;
+	State* update(uint32_t deltaTime) final {
+		State* result = this;
 		if (lastKey == SDLK_SPACE)
-			result = StateID::Playing;
+			result = stateManager->playingState;
 		lastKey = SDLK_UNKNOWN;
 
 		return result;
@@ -239,8 +243,8 @@ public:
 		}
 	}
 
-	StateID update(uint32_t deltaTime) final {
-		StateID result = StateID::Playing;
+	State* update(uint32_t deltaTime) final {
+		State* result = this;
 
 		timer += deltaTime;
 		if (timer < period)
@@ -255,7 +259,7 @@ public:
 			snake.turnRight();
 			break;
 		case SDLK_p:
-			result = StateID::Pause;
+			result = stateManager->pauseState;
 			break;
 		case SDLK_UNKNOWN:
 			break;
@@ -291,10 +295,10 @@ public:
 			lastKey = e.key.keysym.sym;
 	}
 
-	StateID update(uint32_t deltaTime) final {
-		StateID result = StateID::Pause;
+	State* update(uint32_t deltaTime) final {
+		State* result = this;
 		if (lastKey == SDLK_p)
-			result = StateID::Playing;
+			result = stateManager->playingState;
 		lastKey = SDLK_UNKNOWN;
 
 		return result;
@@ -308,20 +312,13 @@ public:
 	}
 };
 
-class StateManager {
-public:
-	MenuState menuState;
-	PlayingState playingState;
-	PauseState pauseState;
-public:
-	StateManager() : menuState(this), playingState(this), pauseState(this) {}
-};
-
+StateManager::StateManager()
+	: menuState(new MenuState{ this }), playingState(new PlayingState{ this }), pauseState(new PauseState{ this }) {}
 
 class Game {
 private:
 	StateManager stateManager;
-	State* state = &stateManager.menuState;
+	State* state = stateManager.menuState;
 public:
 	void run() {
 		SDL_Init(SDL_INIT_VIDEO);
@@ -351,20 +348,7 @@ public:
 			uint32_t deltaTime = SDL_GetTicks() - time;
 			time = SDL_GetTicks();
 			// State Manager
-			StateID nextStateID = state->update(deltaTime);
-			switch (nextStateID) {
-			case StateID::Menu:
-				state = &stateManager.menuState;
-				break;
-			case StateID::Playing:
-				state = &stateManager.playingState;
-				break;
-			case StateID::Pause:
-				state = &stateManager.pauseState;
-				break;
-			default:
-				assert(false); // unknown state
-			}
+			state = state->update(deltaTime);
 
 			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0xFF, 0xFF);
 			SDL_RenderClear(gRenderer);
