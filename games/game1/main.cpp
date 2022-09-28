@@ -129,8 +129,13 @@ enum class StateID
 	Menu, Playing, Pause
 };
 
+class StateManager;
+
 class State {
+protected:
+	StateManager* stateManager = nullptr;
 public:
+	State(StateManager* stateManager) : stateManager(stateManager) {}
 	virtual void handleEvent(const SDL_Event& e) = 0;
 	virtual StateID update(uint32_t deltaTime) = 0;
 	virtual void render(SDL_Renderer* gRenderer, TTF_Font* gFont) = 0;
@@ -142,6 +147,7 @@ private:
 	SDL_Keycode lastKey{};
 
 public:
+	MenuState(StateManager* stateManager) : State(stateManager) {}
 	void handleEvent(const SDL_Event& e) final {
 		if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
 			lastKey = e.key.keysym.sym;
@@ -178,7 +184,7 @@ public:
 	int period = 200;
 
 public:
-	PlayingState() : lastKey{ SDLK_UNKNOWN }, snake{ Cell{gridSize / 2, gridSize / 2}, 2, Direction::LEFT } {
+	PlayingState(StateManager* stateManager) : State(stateManager), lastKey{ SDLK_UNKNOWN }, snake{ Cell{gridSize / 2, gridSize / 2}, 2, Direction::LEFT } {
 		for (const Cell& cell : snake.getCells())
 			assert(!cell.isAtGridWalls(gridSize));
 		placeApple();
@@ -278,6 +284,8 @@ private:
 	SDL_Keycode lastKey{};
 
 public:
+	PauseState(StateManager* stateManager) : State(stateManager) {}
+
 	void handleEvent(const SDL_Event& e) final {
 		if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
 			lastKey = e.key.keysym.sym;
@@ -300,13 +308,20 @@ public:
 	}
 };
 
-
-class Game {
-private:
+class StateManager {
+public:
 	MenuState menuState;
 	PlayingState playingState;
 	PauseState pauseState;
-	State* state;
+public:
+	StateManager() : menuState(this), playingState(this), pauseState(this) {}
+};
+
+
+class Game {
+private:
+	StateManager stateManager;
+	State* state = &stateManager.menuState;
 public:
 	void run() {
 		SDL_Init(SDL_INIT_VIDEO);
@@ -324,7 +339,6 @@ public:
 		SDL_Event e;
 		bool quit = false;
 
-		state = &menuState;
 		uint32_t time = SDL_GetTicks();
 		while (!quit) {
 			while (SDL_PollEvent(&e)) {
@@ -340,13 +354,13 @@ public:
 			StateID nextStateID = state->update(deltaTime);
 			switch (nextStateID) {
 			case StateID::Menu:
-				state = &menuState;
+				state = &stateManager.menuState;
 				break;
 			case StateID::Playing:
-				state = &playingState;
+				state = &stateManager.playingState;
 				break;
 			case StateID::Pause:
-				state = &pauseState;
+				state = &stateManager.pauseState;
 				break;
 			default:
 				assert(false); // unknown state
