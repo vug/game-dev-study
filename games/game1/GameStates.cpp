@@ -83,6 +83,11 @@ void PlayingState::placeApple() {
 	apple = out[0];
 }
 
+void PlayingState::restart() {
+	snake = Snake{ Cell{gridSize / 2, gridSize / 2}, 2, Direction::LEFT };
+	placeApple();
+}
+
 void PlayingState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	// Clear
 	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
@@ -134,10 +139,16 @@ State* PlayingState::update(uint32_t deltaTime) {
 	lastKey = SDLK_UNKNOWN;
 
 	const Cell& nextCell = snake.getNextCell();
-	if (nextCell.isAtGridWalls(gridSize))
+	if (nextCell.isAtGridWalls(gridSize)) {
+		result = stateManager.gameOverState.get();
+		dynamic_cast<GameOverState*>(result)->setGameOverReason("(Snake hit the wall.)");
 		std::cout << "GAME OVER: snake hit wall\n";
-	else if (snake.willBiteItself(nextCell))
+	}
+	else if (snake.willBiteItself(nextCell)) {
+		result = stateManager.gameOverState.get();
+		dynamic_cast<GameOverState*>(result)->setGameOverReason("(Snake bit itself.)");
 		std::cout << "GAME OVER: snake bit itself\n";
+	}
 	else if (nextCell.isSameAs(apple)) {
 		snake.elongate();
 		placeApple();
@@ -151,7 +162,6 @@ State* PlayingState::update(uint32_t deltaTime) {
 
 
 //------------- PauseState
-
 
 PauseState::PauseState(StateManager& stateManager) : State(stateManager) {}
 
@@ -184,9 +194,53 @@ void PauseState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
 }
 
+//------------- GameOverState
+
+GameOverState::GameOverState(StateManager& stateManager) : State(stateManager) {}
+
+void GameOverState::setGameOverReason(const std::string& text) {
+	gameOverReason = text;
+}
+
+void GameOverState::handleEvent(const SDL_Event& e) {
+	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
+		lastKey = e.key.keysym.sym;
+}
+
+State* GameOverState::update(uint32_t deltaTime) {
+	State* result = this;
+	if (lastKey == SDLK_SPACE) {
+		result = stateManager.menuState.get();
+		stateManager.playingState->restart();
+	}
+	lastKey = SDLK_UNKNOWN;
+
+	return result;
+}
+
+void GameOverState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
+	// Render game area without evolving it
+	stateManager.playingState->render(gRenderer, gFont);
+
+	// Draw a semi-transparent fullscreen quad overlay
+	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0x99);
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+	const SDL_Rect rect = { 0, 0, SIZE, SIZE };
+	SDL_RenderFillRect(gRenderer, &rect);
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
+
+	// GameOver rendering specific draw calls
+	renderText("Game Over", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
+	renderText(gameOverReason.c_str(), {0xCC, 0x22, 0x33}, SIZE / 2, SIZE / 2 + 30, gRenderer, gFont, true);
+	renderText("Press SPACE to return to main menu", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, gRenderer, gFont, true);
+
+}
+
 //------------- StateManager
 
 StateManager::StateManager() : 
 	menuState(std::make_unique<MenuState>(*this)), 
 	playingState(std::make_unique<PlayingState>(*this)), 
-	pauseState(std::make_unique<PauseState>(*this)) {}
+	pauseState(std::make_unique<PauseState>(*this)),
+	gameOverState(std::make_unique<GameOverState>(*this))
+	{}

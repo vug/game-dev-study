@@ -13,12 +13,14 @@ class State;
 class MenuState;
 class PlayingState;
 class PauseState;
+class GameOverState;
 
 class StateManager {
 public:
 	std::unique_ptr<MenuState> menuState;
 	std::unique_ptr<PlayingState> playingState;
 	std::unique_ptr<PauseState> pauseState;
+	std::unique_ptr<GameOverState> gameOverState;
 	StateManager();
 };
 
@@ -61,9 +63,11 @@ public:
 public:
 	PlayingState(StateManager& stateManager);
 
-	void handleEvent(const SDL_Event& e)  final;
+	void restart();
 
 	void placeApple();
+
+	void handleEvent(const SDL_Event& e)  final;
 
 	void render(SDL_Renderer* gRenderer, TTF_Font* gFont) final;
 
@@ -76,6 +80,23 @@ private:
 
 public:
 	PauseState(StateManager& stateManager);
+
+	void handleEvent(const SDL_Event& e) final;
+
+	State* update(uint32_t deltaTime) final;
+
+	void render(SDL_Renderer* gRenderer, TTF_Font* gFont) final;
+};
+
+class GameOverState : public State {
+private:
+	SDL_Keycode lastKey{};
+	std::string gameOverReason = "NO REASON GIVEN";
+
+public:
+	GameOverState(StateManager& stateManager);
+
+	void setGameOverReason(const std::string& text);
 
 	void handleEvent(const SDL_Event& e) final;
 
