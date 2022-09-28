@@ -166,9 +166,17 @@ State* PauseState::update(uint32_t deltaTime) {
 }
 
 void PauseState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
-	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
-	SDL_RenderClear(gRenderer);
+	// Render game area without evolving it
+	stateManager->playingState->render(gRenderer, gFont);
 
+	// Draw a semi-transparent fullscreen quad overlay
+	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0x55);
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+	const SDL_Rect rect = { 0, 0, SIZE, SIZE};
+	SDL_RenderFillRect(gRenderer, &rect);
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
+
+	// Pause rendering specific draw calls
 	renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont);
 }
 
