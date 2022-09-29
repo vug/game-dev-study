@@ -140,14 +140,14 @@ State* PlayingState::update(uint32_t deltaTime) {
 
 	const Cell& nextCell = snake.getNextCell();
 	if (nextCell.isAtGridWalls(gridSize)) {
-		result = stateManager.gameOverState.get();
-		dynamic_cast<GameOverState*>(result)->setGameOverReason("(Snake hit the wall.)");
-		std::cout << "GAME OVER: snake hit wall\n";
+		GameOverState& gameOver = *stateManager.gameOverState;
+		result = &gameOver;
+		gameOver.setGameOverReason("(Snake hit the wall.)");
 	}
 	else if (snake.willBiteItself(nextCell)) {
-		result = stateManager.gameOverState.get();
-		dynamic_cast<GameOverState*>(result)->setGameOverReason("(Snake bit itself.)");
-		std::cout << "GAME OVER: snake bit itself\n";
+		GameOverState& gameOver = *stateManager.gameOverState;
+		result = &gameOver;
+		gameOver.setGameOverReason("(Snake bit itself.)");
 	}
 	else if (nextCell.isSameAs(apple)) {
 		snake.elongate();
