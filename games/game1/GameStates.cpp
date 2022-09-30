@@ -13,7 +13,8 @@ const int SIZE = 800;
 
 //------------- MenuState
 
-MenuState::MenuState(StateManager& stateManager) : State(stateManager) {
+MenuState::MenuState(StateManager& stateManager) 
+	: State(stateManager), menu({SIZE / 2, SIZE / 2}) {
 	{
 		Button& startButton = menu.addButton("Start");
 		auto callback = [&]() { this->nextState = stateManager.playingState.get(); };
@@ -54,16 +55,17 @@ State* MenuState::update(uint32_t deltaTime) {
 }
 
 void MenuState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
-	menu.render(gRenderer, gFont);
-
 	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
 	SDL_RenderClear(gRenderer);
 
-	renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
-	renderText("Press SPACE to start...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, gRenderer, gFont, true);
-	renderText("LEFT ARROW turns the snake to the left", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 120, gRenderer, gFont, true);
-	renderText("RIGHT ARROW turns the snake to the right", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 90, gRenderer, gFont, true);
-	renderText("P pauses the game", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 60, gRenderer, gFont, true);
+	menu.render(gRenderer, gFont);
+
+	const int leftMargin = 15;
+	const int lineHeight = 25;
+	renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, 200, gRenderer, gFont, true);
+	renderText("LEFT ARROW turns the snake to the left", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 3, gRenderer, gFont);
+	renderText("RIGHT ARROW turns the snake to the right", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 2, gRenderer, gFont);
+	renderText("P pauses the game", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 1, gRenderer, gFont);
 }
 
 

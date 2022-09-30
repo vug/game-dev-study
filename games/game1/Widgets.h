@@ -10,12 +10,14 @@
 
 class Widget {
 protected:
-	int x = -1;
-	int y = -1;
+	SDL_Point pos{};
 public:
+
 	virtual void render(SDL_Renderer* renderer, TTF_Font* font) = 0;
+
 	virtual void trigger() = 0;
-	void setPosition(int x, int y) { this->x = x; this->y = y; }
+
+	void setPosition(const SDL_Point& p);
 };
 
 class Button : public Widget {
@@ -35,9 +37,12 @@ class Menu {
 private:
 	std::vector<std::unique_ptr<Widget>> widgets;
 	int32_t selectionIx = 0;
-	int x;
-	int y;
+	SDL_Point pos;
+	SDL_Point cursor = {0 ,0};
+	const int LINE_HEIGHT = 20;
 public:
+	Menu(const SDL_Point& pos);
+
 	Button& addButton(const std::string& text);
 
 	// render every widget
