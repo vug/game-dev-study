@@ -1,6 +1,6 @@
 set(GAME Snake)
 add_executable(${GAME}
-  Snake.cpp GameStates.cpp main.cpp)
+  Snake.cpp GameStates.cpp Widgets.cpp main.cpp)
 
 target_link_libraries(${GAME} PRIVATE
   SDL2::SDL2main SDL2::SDL2

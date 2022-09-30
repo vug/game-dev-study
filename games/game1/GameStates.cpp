@@ -1,5 +1,7 @@
 #include "GameStates.h"
 
+#include "Widgets.h"
+
 #include <algorithm>
 #include <iostream>
 #include <random>
@@ -24,7 +26,11 @@ void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Rend
 
 //------------- MenuState
 
-MenuState::MenuState(StateManager& stateManager) : State(stateManager) {}
+MenuState::MenuState(StateManager& stateManager) : State(stateManager) {
+	Button& startButton = menu.addButton("Start");
+	auto callback = [&]() { this->nextState = stateManager.playingState.get(); };
+	startButton.registerCallback(callback);
+}
 
 void MenuState::handleEvent(const SDL_Event& e) {
 	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
@@ -33,14 +39,25 @@ void MenuState::handleEvent(const SDL_Event& e) {
 
 State* MenuState::update(uint32_t deltaTime) {
 	State* result = this;
+	// TODO: return switchToNextStateIfAny();
+	if (nextState) {
+		result = nextState;
+		nextState = nullptr;
+		return result;
+	}
+		
+	// TODO: remove, once it's the menu who handles the state change
 	if (lastKey == SDLK_SPACE)
 		result = stateManager.playingState.get();
+	menu.handleKeys(lastKey);
 	lastKey = SDLK_UNKNOWN;
 
 	return result;
 }
 
 void MenuState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
+	menu.render(gRenderer, gFont);
+
 	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
 	SDL_RenderClear(gRenderer);
 

@@ -2,6 +2,7 @@
 
 #include "Cell.h"
 #include "Snake.h"
+#include "Widgets.h"
 
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -39,6 +40,8 @@ public:
 class MenuState : public State {
 private:
 	SDL_Keycode lastKey{};
+	Menu menu;
+	State* nextState = nullptr;
 
 public:
 	MenuState(StateManager& stateManager);
