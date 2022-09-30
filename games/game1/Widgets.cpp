@@ -7,14 +7,8 @@ void Button::trigger() {}
 void Button::registerCallback(std::function<void()> func) {}
 
 Button& Menu::addButton(const std::string& text) {
-	widgets.emplace_back(Button{ text });
-	Widget* w = widgets.back().get();
-	Button* b = dynamic_cast<Button*>(w);
-	return *b;
-
-	//auto b2 = std::make_unique<Button>(text);
-	//widgets.push_back(std::move(b2));
-	//return *b2;
+	widgets.push_back(std::make_unique<Button>(text));
+	return static_cast<Button&>(*widgets.back());
 }
 
 void Menu::render(SDL_Renderer* renderer, TTF_Font* font) {}
