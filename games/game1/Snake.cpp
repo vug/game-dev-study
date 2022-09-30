@@ -1,12 +1,6 @@
 #include "Snake.h"
 
-int positiveModulus(int num, int mod)
-{
-	int result = num % mod;
-	if (result < 0)
-		result += mod;
-	return result;
-}
+#include <gds.h>
 
 Snake::Snake(Cell head, uint32_t length, Direction dir)
 	: dir{ dir } {

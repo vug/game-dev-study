@@ -9,7 +9,7 @@
 #include <vector>
 
 class Widget {
-private:
+protected:
 	int x = -1;
 	int y = -1;
 public:

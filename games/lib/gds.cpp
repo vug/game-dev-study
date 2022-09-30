@@ -16,3 +16,11 @@ void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Rend
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(textSurface);
 }
+
+int positiveModulus(int num, int mod)
+{
+	int result = num % mod;
+	if (result < 0)
+		result += mod;
+	return result;
+}

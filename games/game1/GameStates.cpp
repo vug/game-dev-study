@@ -33,9 +33,6 @@ State* MenuState::update(uint32_t deltaTime) {
 		return result;
 	}
 		
-	// TODO: remove, once it's the menu who handles the state change
-	if (lastKey == SDLK_SPACE)
-		result = stateManager.playingState.get();
 	menu.handleKeys(lastKey);
 	lastKey = SDLK_UNKNOWN;
 
