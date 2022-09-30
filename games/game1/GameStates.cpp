@@ -14,9 +14,23 @@ const int SIZE = 800;
 //------------- MenuState
 
 MenuState::MenuState(StateManager& stateManager) : State(stateManager) {
-	Button& startButton = menu.addButton("Start");
-	auto callback = [&]() { this->nextState = stateManager.playingState.get(); };
-	startButton.registerCallback(callback);
+	{
+		Button& startButton = menu.addButton("Start");
+		auto callback = [&]() { this->nextState = stateManager.playingState.get(); };
+		startButton.registerCallback(callback);
+	}
+
+	{
+		Button& exitButton = menu.addButton("Exit");
+		auto callback = [&]() {
+			SDL_Event exit{};
+			exit.type = SDL_QUIT;
+			exit.quit = SDL_QuitEvent{ SDL_QUIT, SDL_GetTicks() };
+			SDL_PushEvent(&exit);
+		};
+		exitButton.registerCallback(callback);
+	}
+
 }
 
 void MenuState::handleEvent(const SDL_Event& e) {
