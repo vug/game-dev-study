@@ -34,7 +34,7 @@ public:
 class Menu {
 private:
 	std::vector<std::unique_ptr<Widget>> widgets;
-	int32_t selectionIx;
+	int32_t selectionIx = 0;
 	int x;
 	int y;
 public:

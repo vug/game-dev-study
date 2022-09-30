@@ -2,7 +2,8 @@
 
 #include <gds.h>
 
-// TODO: Fill out implementation
+//------------- Button
+
 Button::Button(const std::string& text) : text(text) {}
 void Button::render(SDL_Renderer* renderer, TTF_Font* font) {
 	renderText(text, { 0xCC, 0x22, 0x33 }, x, y, renderer, font, false);
@@ -32,7 +33,7 @@ void Menu::handleKeys(SDL_Keycode key) {
 		selectionIx = positiveModulus(selectionIx - 1, widgets.size());
 		break;
 	case SDLK_DOWN:
-		selectionIx = selectionIx % widgets.size();
+		selectionIx = (selectionIx + 1) % widgets.size();
 		break;
 	case SDLK_RETURN:
 		widgets[selectionIx]->trigger();
