@@ -33,6 +33,22 @@ public:
 	void registerCallback(std::function<void()> func);
 };
 
+class Selector : public Widget {
+private:
+	std::string label;
+	std::vector<std::string> options;
+	int32_t selectionIx = 0;
+	std::function<void()> callback;
+public:
+	Selector(const std::string& label, const std::vector<std::string> options);
+
+	void render(SDL_Renderer* renderer, TTF_Font* font) final;
+	void trigger() final;
+
+	const std::string& getSelection() const;
+	void registerCallback(std::function<void()> func);
+};
+
 class Menu {
 private:
 	std::vector<std::unique_ptr<Widget>> widgets;
@@ -44,6 +60,7 @@ public:
 	Menu(const SDL_Point& pos);
 
 	Button& addButton(const std::string& text);
+	Selector& addSelector(const std::string& label, const std::vector<std::string> options);
 
 	// render every widget
 	void render(SDL_Renderer* renderer, TTF_Font* font);

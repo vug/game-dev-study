@@ -2,7 +2,7 @@
 
 #include <gds.h>
 
-//------------- Button
+//------------- Widget
 
 void Widget::setPosition(const SDL_Point& p) {
 	pos = p; 
@@ -24,6 +24,28 @@ void Button::registerCallback(std::function<void()> func) {
 	callback = func;
 }
 
+//------------- Selector
+
+Selector::Selector(const std::string& label, const std::vector<std::string> options) 
+	: label(label), options(options) {}
+
+void Selector::render(SDL_Renderer* renderer, TTF_Font* font) {
+	renderText(label + ": " + options[selectionIx], {0xCC, 0x22, 0x33}, pos.x, pos.y, renderer, font, false);
+}
+
+void Selector::trigger() {
+	selectionIx = positiveModulus(selectionIx + 1, options.size());
+	callback();
+}
+
+const std::string& Selector::getSelection() const {
+	return options[selectionIx];
+}
+
+void Selector::registerCallback(std::function<void()> func) {
+	callback = func;
+}
+
 
 //------------- Menu
 
@@ -32,11 +54,21 @@ Menu::Menu(const SDL_Point& pos) : pos(pos) {}
 Button& Menu::addButton(const std::string& text) {
 	widgets.push_back(std::make_unique<Button>(text));
 
-	Button& b = static_cast<Button&>(*widgets.back());
-	b.setPosition(addPoints(pos, cursor));
+	Button& w = static_cast<Button&>(*widgets.back());
+	w.setPosition(addPoints(pos, cursor));
 
 	cursor = addPoints(cursor, {0, LINE_HEIGHT});
-	return b;
+	return w;
+}
+
+Selector& Menu::addSelector(const std::string& label, const std::vector<std::string> options) {
+	widgets.push_back(std::make_unique<Selector>(label, options));
+
+	Selector& w = static_cast<Selector&>(*widgets.back());
+	w.setPosition(addPoints(pos, cursor));
+
+	cursor = addPoints(cursor, { 0, LINE_HEIGHT });
+	return w;
 }
 
 void Menu::render(SDL_Renderer* renderer, TTF_Font* font) {
