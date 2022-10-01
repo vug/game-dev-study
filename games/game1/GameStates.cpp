@@ -44,6 +44,25 @@ MenuState::MenuState(StateManager& stateManager)
 	}
 
 	{
+		// Speed
+		static const std::string SLOW = "Slow";
+		static const std::string MEDIUM = "Medium";
+		static const std::string FAST = "Fast";
+		Selector& speedSelector = menu.addSelector("Speed", { SLOW, MEDIUM, FAST });
+		auto callback = [&]() {
+			int32_t& period = stateManager.playingState->period;
+			const std::string& selected = speedSelector.getSelection();
+			if (selected == SLOW)
+				period = 400;
+			else if (selected == MEDIUM)
+				period = 200;
+			else if (selected == FAST)
+				period = 100;
+		};
+		speedSelector.registerCallback(callback);
+	}
+
+	{
 		Button& exitButton = menu.addButton("Exit");
 		auto callback = [&]() {
 			SDL_Event exit{};
