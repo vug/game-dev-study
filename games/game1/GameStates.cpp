@@ -17,8 +17,30 @@ MenuState::MenuState(StateManager& stateManager)
 	: State(stateManager), menu({SIZE / 2, SIZE / 2}) {
 	{
 		Button& startButton = menu.addButton("Start");
-		auto callback = [&]() { this->nextState = stateManager.playingState.get(); };
+		auto callback = [&]() { 
+			stateManager.playingState->restart();
+			this->nextState = stateManager.playingState.get();
+		};
 		startButton.registerCallback(callback);
+	}
+
+	{
+		// Grid Size
+		static const std::string SMALL = "Small";
+		static const std::string MEDIUM = "Medium";
+		static const std::string LARGE = "Large";
+		Selector& sizeSelector = menu.addSelector("Area Size", { SMALL, MEDIUM, LARGE });
+		auto callback = [&]() {
+			int32_t& size = stateManager.playingState->gridSize;
+			const std::string& selected = sizeSelector.getSelection();
+			if (selected == SMALL)
+				size = 10;
+			else if (selected == MEDIUM)
+				size = 20;
+			else if (selected == LARGE)
+				size = 40;
+		};
+		sizeSelector.registerCallback(callback);
 	}
 
 	{
@@ -101,6 +123,7 @@ void PlayingState::placeApple() {
 }
 
 void PlayingState::restart() {
+	score = 0;
 	snake = Snake{ Cell{gridSize / 2, gridSize / 2}, 2, Direction::LEFT };
 	placeApple();
 }

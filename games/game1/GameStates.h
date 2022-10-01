@@ -52,7 +52,6 @@ public:
 
 class PlayingState : public State {
 private:
-	int32_t gridSize{ 15 };
 	SDL_Keycode lastKey;
 	Snake snake;
 	Cell apple;
@@ -61,7 +60,8 @@ private:
 	std::mt19937 rnd = std::mt19937{ std::random_device{}() };
 	//State* state;
 public:
-	int period = 200;
+	int32_t gridSize{ 15 };
+	int32_t period = 200;
 
 public:
 	PlayingState(StateManager& stateManager);
