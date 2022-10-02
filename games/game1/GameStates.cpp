@@ -14,7 +14,9 @@ const int SIZE = 800;
 //------------- MenuState
 
 MenuState::MenuState(StateManager& stateManager) 
-	: State(stateManager), mainPage({SIZE / 2, SIZE / 2}) {
+	: State(stateManager), mainPage({SIZE / 2, SIZE / 2}), settingsPage({ SIZE / 2, SIZE / 2 }), menu(mainPage) {
+
+	// Main Page
 	{
 		Button& startButton = mainPage.addButton("Start");
 		auto callback = [&]() { 
@@ -25,11 +27,31 @@ MenuState::MenuState(StateManager& stateManager)
 	}
 
 	{
+		Button& settingsButton = mainPage.addButton("Settings");
+		auto callback = [&]() {
+			menu.pushPage(settingsPage);
+		};
+		settingsButton.registerCallback(callback);
+	}
+
+	{
+		Button& exitButton = mainPage.addButton("Exit");
+		auto callback = [&]() {
+			SDL_Event exit{};
+			exit.type = SDL_QUIT;
+			exit.quit = SDL_QuitEvent{ SDL_QUIT, SDL_GetTicks() };
+			SDL_PushEvent(&exit);
+		};
+		exitButton.registerCallback(callback);
+	}
+
+	// Settings Page
+	{
 		// Grid Size
 		static const std::string SMALL = "Small";
 		static const std::string MEDIUM = "Medium";
 		static const std::string LARGE = "Large";
-		Selector& sizeSelector = mainPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE });
+		Selector& sizeSelector = settingsPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE });
 		auto callback = [&]() {
 			int32_t& size = stateManager.playingState->gridSize;
 			const std::string& selected = sizeSelector.getSelection();
@@ -48,7 +70,7 @@ MenuState::MenuState(StateManager& stateManager)
 		static const std::string SLOW = "Slow";
 		static const std::string MEDIUM = "Medium";
 		static const std::string FAST = "Fast";
-		Selector& speedSelector = mainPage.addSelector("Speed", { SLOW, MEDIUM, FAST });
+		Selector& speedSelector = settingsPage.addSelector("Speed", { SLOW, MEDIUM, FAST });
 		auto callback = [&]() {
 			int32_t& period = stateManager.playingState->period;
 			const std::string& selected = speedSelector.getSelection();
@@ -63,16 +85,14 @@ MenuState::MenuState(StateManager& stateManager)
 	}
 
 	{
-		Button& exitButton = mainPage.addButton("Exit");
+		Button& backButton = settingsPage.addButton("Back");
 		auto callback = [&]() {
-			SDL_Event exit{};
-			exit.type = SDL_QUIT;
-			exit.quit = SDL_QuitEvent{ SDL_QUIT, SDL_GetTicks() };
-			SDL_PushEvent(&exit);
+			menu.popPage();
 		};
-		exitButton.registerCallback(callback);
+		backButton.registerCallback(callback);
 	}
 
+	menu.pushPage(mainPage);
 }
 
 void MenuState::handleEvent(const SDL_Event& e) {
@@ -89,7 +109,7 @@ State* MenuState::update(uint32_t deltaTime) {
 		return result;
 	}
 		
-	mainPage.handleKeys(lastKey);
+	menu.handleKeys(lastKey);
 	lastKey = SDLK_UNKNOWN;
 
 	return result;
@@ -99,7 +119,7 @@ void MenuState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
 	SDL_RenderClear(gRenderer);
 
-	mainPage.render(gRenderer, gFont);
+	menu.render(gRenderer, gFont);
 
 	const int leftMargin = 15;
 	const int lineHeight = 25;

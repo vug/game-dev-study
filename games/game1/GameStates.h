@@ -41,6 +41,8 @@ class MenuState : public State {
 private:
 	SDL_Keycode lastKey{};
 	MenuPage mainPage;
+	MenuPage settingsPage;
+	Menu menu;
 	State* nextState = nullptr;
 
 public:
