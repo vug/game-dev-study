@@ -40,7 +40,7 @@ public:
 class MenuState : public State {
 private:
 	SDL_Keycode lastKey{};
-	Menu menu;
+	MenuPage mainPage;
 	State* nextState = nullptr;
 
 public:

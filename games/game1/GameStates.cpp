@@ -14,9 +14,9 @@ const int SIZE = 800;
 //------------- MenuState
 
 MenuState::MenuState(StateManager& stateManager) 
-	: State(stateManager), menu({SIZE / 2, SIZE / 2}) {
+	: State(stateManager), mainPage({SIZE / 2, SIZE / 2}) {
 	{
-		Button& startButton = menu.addButton("Start");
+		Button& startButton = mainPage.addButton("Start");
 		auto callback = [&]() { 
 			stateManager.playingState->restart();
 			this->nextState = stateManager.playingState.get();
@@ -29,7 +29,7 @@ MenuState::MenuState(StateManager& stateManager)
 		static const std::string SMALL = "Small";
 		static const std::string MEDIUM = "Medium";
 		static const std::string LARGE = "Large";
-		Selector& sizeSelector = menu.addSelector("Area Size", { SMALL, MEDIUM, LARGE });
+		Selector& sizeSelector = mainPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE });
 		auto callback = [&]() {
 			int32_t& size = stateManager.playingState->gridSize;
 			const std::string& selected = sizeSelector.getSelection();
@@ -48,7 +48,7 @@ MenuState::MenuState(StateManager& stateManager)
 		static const std::string SLOW = "Slow";
 		static const std::string MEDIUM = "Medium";
 		static const std::string FAST = "Fast";
-		Selector& speedSelector = menu.addSelector("Speed", { SLOW, MEDIUM, FAST });
+		Selector& speedSelector = mainPage.addSelector("Speed", { SLOW, MEDIUM, FAST });
 		auto callback = [&]() {
 			int32_t& period = stateManager.playingState->period;
 			const std::string& selected = speedSelector.getSelection();
@@ -63,7 +63,7 @@ MenuState::MenuState(StateManager& stateManager)
 	}
 
 	{
-		Button& exitButton = menu.addButton("Exit");
+		Button& exitButton = mainPage.addButton("Exit");
 		auto callback = [&]() {
 			SDL_Event exit{};
 			exit.type = SDL_QUIT;
@@ -89,7 +89,7 @@ State* MenuState::update(uint32_t deltaTime) {
 		return result;
 	}
 		
-	menu.handleKeys(lastKey);
+	mainPage.handleKeys(lastKey);
 	lastKey = SDLK_UNKNOWN;
 
 	return result;
@@ -99,7 +99,7 @@ void MenuState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
 	SDL_RenderClear(gRenderer);
 
-	menu.render(gRenderer, gFont);
+	mainPage.render(gRenderer, gFont);
 
 	const int leftMargin = 15;
 	const int lineHeight = 25;

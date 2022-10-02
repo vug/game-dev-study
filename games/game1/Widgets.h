@@ -49,7 +49,7 @@ public:
 	void registerCallback(std::function<void()> func);
 };
 
-class Menu {
+class MenuPage {
 private:
 	std::vector<std::unique_ptr<Widget>> widgets;
 	int32_t selectionIx = 0;
@@ -57,7 +57,7 @@ private:
 	SDL_Point cursor = {0 ,0};
 	const int LINE_HEIGHT = 20;
 public:
-	Menu(const SDL_Point& pos);
+	MenuPage(const SDL_Point& pos);
 
 	Button& addButton(const std::string& text);
 	Selector& addSelector(const std::string& label, const std::vector<std::string> options);

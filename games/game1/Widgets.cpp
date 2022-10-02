@@ -47,11 +47,11 @@ void Selector::registerCallback(std::function<void()> func) {
 }
 
 
-//------------- Menu
+//------------- MenuPage
 
-Menu::Menu(const SDL_Point& pos) : pos(pos) {}
+MenuPage::MenuPage(const SDL_Point& pos) : pos(pos) {}
 
-Button& Menu::addButton(const std::string& text) {
+Button& MenuPage::addButton(const std::string& text) {
 	widgets.push_back(std::make_unique<Button>(text));
 
 	Button& w = static_cast<Button&>(*widgets.back());
@@ -61,7 +61,7 @@ Button& Menu::addButton(const std::string& text) {
 	return w;
 }
 
-Selector& Menu::addSelector(const std::string& label, const std::vector<std::string> options) {
+Selector& MenuPage::addSelector(const std::string& label, const std::vector<std::string> options) {
 	widgets.push_back(std::make_unique<Selector>(label, options));
 
 	Selector& w = static_cast<Selector&>(*widgets.back());
@@ -71,7 +71,7 @@ Selector& Menu::addSelector(const std::string& label, const std::vector<std::str
 	return w;
 }
 
-void Menu::render(SDL_Renderer* renderer, TTF_Font* font) {
+void MenuPage::render(SDL_Renderer* renderer, TTF_Font* font) {
 	for (auto& w : widgets)
 		w->render(renderer, font);
 	auto selectionIndicator = SDL_Rect{ pos.x - 2 * LINE_HEIGHT, pos.y + selectionIx * LINE_HEIGHT, LINE_HEIGHT, LINE_HEIGHT };
@@ -80,7 +80,7 @@ void Menu::render(SDL_Renderer* renderer, TTF_Font* font) {
 	SDL_RenderFillRect(renderer, &selectionIndicator);
 }
 
-void Menu::handleKeys(SDL_Keycode key) {
+void MenuPage::handleKeys(SDL_Keycode key) {
 	switch (key) {
 	case SDLK_UP:
 		selectionIx = positiveModulus(selectionIx - 1, widgets.size());
