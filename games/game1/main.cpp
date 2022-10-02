@@ -20,12 +20,8 @@ private:
 public:
 	void run() {
 		gds::Sdl sdl = gds::Sdl("Snake", SIZE, SIZE);
-
 		const char* fontFile = "assets/fonts/enter_command/EnterCommand.ttf"; // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
-		TTF_Font* gFont = TTF_OpenFont(fontFile, 28);
-		if (gFont == nullptr)
-			std::cout << "font not found! " << TTF_GetError() << "\n";
-		TTF_SetFontStyle(gFont, TTF_STYLE_NORMAL);
+		gds::Font font = gds::Font(fontFile, 28);
 
 		SDL_Event e;
 		bool quit = false;
@@ -47,12 +43,10 @@ public:
 			SDL_SetRenderDrawColor(sdl.renderer, 0xFF, 0x00, 0xFF, 0xFF);
 			SDL_RenderClear(sdl.renderer);
 
-			state->render(sdl.renderer, gFont);
+			state->render(sdl.renderer, font.sdlFont);
 
 			sdl.renderPresent();
 		}
-
-		TTF_CloseFont(gFont);
 	}
 };
 
