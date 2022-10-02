@@ -44,6 +44,31 @@ bool Font::isValid() const {
 }
 
 
+//------------- Texture
+
+Texture::~Texture() {
+	SDL_DestroyTexture(sdlTexture);
+}
+
+bool Texture::isValid() const {
+	return sdlTexture != nullptr;
+}
+
+Texture::Texture(const Sdl& sdl, const Font& font, const std::string& text, const SDL_Color& color) 
+	: sdl(sdl) {
+
+	SDL_Surface* textSurface = TTF_RenderText_Blended(font.sdlFont, text.c_str(), color); // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs
+	sdlTexture = SDL_CreateTextureFromSurface(sdl.renderer, textSurface);
+	SDL_QueryTexture(sdlTexture, &format, &access, &width, &height);
+	SDL_FreeSurface(textSurface);
+}
+
+void Texture::render(const SDL_Point& pos) {
+	SDL_Rect dstRect{ pos.x, pos.y, width, height };
+	SDL_RenderCopy(sdl.renderer, sdlTexture, NULL, &dstRect);
+}
+
+
 void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Renderer* renderer, TTF_Font* font, bool center) {
 	SDL_Surface* textSurface = TTF_RenderText_Blended(font, text.c_str(), color);   // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs
 	if (textSurface == nullptr)

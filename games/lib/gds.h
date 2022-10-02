@@ -32,6 +32,22 @@ public:
 	bool isValid() const;
 };
 
+class Texture {
+private:
+	const Sdl& sdl;
+	SDL_Texture* sdlTexture = nullptr;
+	uint32_t format{};
+	int access{};
+	int width{};
+	int height{};
+public:
+	Texture(const Sdl& sdl, const Font& font, const std::string& text, const SDL_Color& color = { 0xFF, 0xFF, 0xFF });
+	~Texture();
+	bool isValid() const;
+
+	void render(const SDL_Point& pos);
+};
+
 void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Renderer* renderer, TTF_Font* font, bool center = false);
 
 int positiveModulus(int num, int mod);
