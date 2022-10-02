@@ -4,8 +4,6 @@
 
 #include <vector>
 
-int positiveModulus(int num, int mod);
-
 class Snake {
 private:
 	// from head to tail

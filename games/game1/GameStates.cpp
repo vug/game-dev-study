@@ -123,10 +123,10 @@ void MenuState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 
 	const int leftMargin = 15;
 	const int lineHeight = 25;
-	renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, 200, gRenderer, gFont, true);
-	renderText("LEFT ARROW turns the snake to the left", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 3, gRenderer, gFont);
-	renderText("RIGHT ARROW turns the snake to the right", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 2, gRenderer, gFont);
-	renderText("P pauses the game", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 1, gRenderer, gFont);
+	gds::renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, 200, gRenderer, gFont, true);
+	gds::renderText("LEFT ARROW turns the snake to the left", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 3, gRenderer, gFont);
+	gds::renderText("RIGHT ARROW turns the snake to the right", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 2, gRenderer, gFont);
+	gds::renderText("P pauses the game", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 1, gRenderer, gFont);
 }
 
 
@@ -191,7 +191,7 @@ void PlayingState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	// Render texts such as score
 	{
 		std::string text = "score: " + std::to_string(score);
-		renderText(text, { 0xCC, 0xCC, 0xCC }, 0, 0, gRenderer, gFont);
+		gds::renderText(text, { 0xCC, 0xCC, 0xCC }, 0, 0, gRenderer, gFont);
 	}
 }
 
@@ -271,7 +271,7 @@ void PauseState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
 
 	// Pause rendering specific draw calls
-	renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
+	gds::renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
 }
 
 //------------- GameOverState
@@ -310,9 +310,9 @@ void GameOverState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
 
 	// GameOver rendering specific draw calls
-	renderText("Game Over", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
-	renderText(gameOverReason.c_str(), {0xCC, 0x22, 0x33}, SIZE / 2, SIZE / 2 + 30, gRenderer, gFont, true);
-	renderText("Press SPACE to return to main menu", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, gRenderer, gFont, true);
+	gds::renderText("Game Over", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gRenderer, gFont, true);
+	gds::renderText(gameOverReason.c_str(), {0xCC, 0x22, 0x33}, SIZE / 2, SIZE / 2 + 30, gRenderer, gFont, true);
+	gds::renderText("Press SPACE to return to main menu", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, gRenderer, gFont, true);
 
 }
 

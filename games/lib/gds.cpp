@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+namespace gds {
+
 void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Renderer* renderer, TTF_Font* font, bool center) {
 	SDL_Surface* textSurface = TTF_RenderText_Blended(font, text.c_str(), color);   // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs
 	if (textSurface == nullptr)
@@ -26,4 +28,6 @@ int positiveModulus(int num, int mod) {
 
 SDL_Point addPoints(const SDL_Point& a, const SDL_Point& b) {
 	return { a.x + b.x, a.y + b.y };
+}
+
 }

@@ -15,7 +15,7 @@ void Widget::setPosition(const SDL_Point& p) {
 
 Button::Button(const std::string& text) : text(text) {}
 void Button::render(SDL_Renderer* renderer, TTF_Font* font) {
-	renderText(text, { 0xCC, 0x22, 0x33 }, pos.x, pos.y, renderer, font, false);
+	gds::renderText(text, { 0xCC, 0x22, 0x33 }, pos.x, pos.y, renderer, font, false);
 }
 
 void Button::trigger() {
@@ -32,11 +32,11 @@ Selector::Selector(const std::string& label, const std::vector<std::string> opti
 	: label(label), options(options) {}
 
 void Selector::render(SDL_Renderer* renderer, TTF_Font* font) {
-	renderText(label + ": " + options[selectionIx], {0xCC, 0x22, 0x33}, pos.x, pos.y, renderer, font, false);
+	gds::renderText(label + ": " + options[selectionIx], {0xCC, 0x22, 0x33}, pos.x, pos.y, renderer, font, false);
 }
 
 void Selector::trigger() {
-	selectionIx = positiveModulus(selectionIx + 1, options.size());
+	selectionIx = gds::positiveModulus(selectionIx + 1, options.size());
 	callback();
 }
 
@@ -57,9 +57,9 @@ Button& MenuPage::addButton(const std::string& text) {
 	widgets.push_back(std::make_unique<Button>(text));
 
 	Button& w = static_cast<Button&>(*widgets.back());
-	w.setPosition(addPoints(pos, cursor));
+	w.setPosition(gds::addPoints(pos, cursor));
 
-	cursor = addPoints(cursor, {0, LINE_HEIGHT});
+	cursor = gds::addPoints(cursor, {0, LINE_HEIGHT});
 	return w;
 }
 
@@ -67,9 +67,9 @@ Selector& MenuPage::addSelector(const std::string& label, const std::vector<std:
 	widgets.push_back(std::make_unique<Selector>(label, options));
 
 	Selector& w = static_cast<Selector&>(*widgets.back());
-	w.setPosition(addPoints(pos, cursor));
+	w.setPosition(gds::addPoints(pos, cursor));
 
-	cursor = addPoints(cursor, { 0, LINE_HEIGHT });
+	cursor = gds::addPoints(cursor, { 0, LINE_HEIGHT });
 	return w;
 }
 
@@ -85,7 +85,7 @@ void MenuPage::render(SDL_Renderer* renderer, TTF_Font* font) {
 void MenuPage::handleKeys(SDL_Keycode key) {
 	switch (key) {
 	case SDLK_UP:
-		selectionIx = positiveModulus(selectionIx - 1, widgets.size());
+		selectionIx = gds::positiveModulus(selectionIx - 1, widgets.size());
 		break;
 	case SDLK_DOWN:
 		selectionIx = (selectionIx + 1) % widgets.size();

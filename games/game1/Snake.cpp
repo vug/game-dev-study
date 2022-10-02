@@ -12,8 +12,8 @@ Snake::Snake(Cell head, uint32_t length, Direction dir)
 }
 
 // signs are opposite because the rendering surface is upside-down
-void Snake::turnRight() { dir = static_cast<Direction>(positiveModulus(static_cast<int>(dir) - 1, 4)); }
-void Snake::turnLeft() { dir = static_cast<Direction>(positiveModulus(static_cast<int>(dir) + 1, 4)); }
+void Snake::turnRight() { dir = static_cast<Direction>(gds::positiveModulus(static_cast<int>(dir) - 1, 4)); }
+void Snake::turnLeft() { dir = static_cast<Direction>(gds::positiveModulus(static_cast<int>(dir) + 1, 4)); }
 
 Cell Snake::getNextCell() {
 	return getHead().addCell(Cell::deltaCell(dir));
