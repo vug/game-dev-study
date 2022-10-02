@@ -1,6 +1,8 @@
 #include "GameStates.h"
 #include "Snake.h"
 
+#include <gds.h>
+
 #include <SDL.h>
 #include <SDL_ttf.h>
 
@@ -17,18 +19,14 @@ private:
 	State* state = stateManager.menuState.get();
 public:
 	void run() {
-		SDL_Init(SDL_INIT_VIDEO);
-		TTF_Init();
-		SDL_Window* gWindow = SDL_CreateWindow("Snake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SIZE, SIZE, SDL_WINDOW_SHOWN);
-		//SDL_Surface* gScreenSurface = SDL_GetWindowSurface(gWindow);
-		SDL_Renderer* gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+		gds::Sdl sdl = gds::Sdl("Snake", SIZE, SIZE);
+
 		const char* fontFile = "assets/fonts/enter_command/EnterCommand.ttf"; // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
 		TTF_Font* gFont = TTF_OpenFont(fontFile, 28);
 		if (gFont == nullptr)
 			std::cout << "font not found! " << TTF_GetError() << "\n";
 		TTF_SetFontStyle(gFont, TTF_STYLE_NORMAL);
 
-		SDL_UpdateWindowSurface(gWindow);
 		SDL_Event e;
 		bool quit = false;
 
@@ -46,19 +44,15 @@ public:
 			// State Manager
 			state = state->update(deltaTime);
 
-			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0xFF, 0xFF);
-			SDL_RenderClear(gRenderer);
+			SDL_SetRenderDrawColor(sdl.renderer, 0xFF, 0x00, 0xFF, 0xFF);
+			SDL_RenderClear(sdl.renderer);
 
-			state->render(gRenderer, gFont);
+			state->render(sdl.renderer, gFont);
 
-			SDL_RenderPresent(gRenderer);
+			sdl.renderPresent();
 		}
 
 		TTF_CloseFont(gFont);
-		TTF_Quit();
-		SDL_DestroyRenderer(gRenderer);
-		SDL_DestroyWindow(gWindow);
-		SDL_Quit();
 	}
 };
 

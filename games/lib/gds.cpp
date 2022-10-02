@@ -4,6 +4,27 @@
 
 namespace gds {
 
+//------------- Sdl
+
+Sdl::Sdl(const std::string& name, int width, int height) : name(name), width(width), height(height) {
+	SDL_Init(SDL_INIT_VIDEO);
+	TTF_Init();
+	window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+	//SDL_Surface* gScreenSurface = SDL_GetWindowSurface(gWindow);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+}
+
+Sdl::~Sdl() {
+	TTF_Quit();
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+}
+
+void Sdl::renderPresent() const {
+	SDL_RenderPresent(renderer);
+}
+
 void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Renderer* renderer, TTF_Font* font, bool center) {
 	SDL_Surface* textSurface = TTF_RenderText_Blended(font, text.c_str(), color);   // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs
 	if (textSurface == nullptr)
