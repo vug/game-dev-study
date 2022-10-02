@@ -145,9 +145,10 @@ void PlayingState::handleEvent(const SDL_Event& e) {
 }
 
 void PlayingState::placeApple() {
-	std::vector<Cell> availableCells{};
-	std::vector<Cell> out; // a vector, not a single cell because of std::sample API
 	const int32_t numCells = gridSize * gridSize;
+	std::vector<Cell> availableCells{};
+	availableCells.reserve(numCells);
+	std::vector<Cell> out; // a vector, not a single cell because of std::sample API
 	for (int32_t i = 0; i < numCells; ++i) {
 		Cell cell{ i % gridSize , i / gridSize };
 		if (!snake.hasCell(cell))
