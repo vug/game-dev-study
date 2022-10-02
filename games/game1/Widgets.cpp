@@ -2,6 +2,8 @@
 
 #include <gds.h>
 
+#include <cassert>
+
 //------------- Widget
 
 void Widget::setPosition(const SDL_Point& p) {
@@ -94,4 +96,33 @@ void MenuPage::handleKeys(SDL_Keycode key) {
 	default:
 		break;
 	}
+}
+
+
+//------------- Menu
+
+Menu::Menu(MenuPage& mainPage) {
+	pages.push(mainPage);
+}
+
+void Menu::pushPage(MenuPage& page) {
+	pages.push(page);
+}
+
+void Menu::popPage() {
+	assert(pages.size() > 1); // don't pop main page
+	pages.pop();
+}
+
+MenuPage& Menu::peekPage() {
+	assert(!pages.empty());
+	return pages.top();
+}
+
+void Menu::render(SDL_Renderer* renderer, TTF_Font* font) {
+	peekPage().render(renderer, font);
+}
+
+void Menu::handleKeys(SDL_Keycode key) {
+	peekPage().handleKeys(key);
 }

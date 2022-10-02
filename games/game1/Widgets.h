@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <memory>
+#include <stack>
 #include <string>
 #include <vector>
 
@@ -66,5 +67,24 @@ public:
 	void render(SDL_Renderer* renderer, TTF_Font* font);
 
 	// up/down for selecting widgets, enter to trigger them
+	void handleKeys(SDL_Keycode key);
+};
+
+// Holds references to pages in a stack so that a tree of pages can be traversed
+class Menu {
+private:
+	// Ex: Main Page > Settings Page > Audio Settings Page
+	std::stack<std::reference_wrapper<MenuPage>> pages;
+public:
+	Menu(MenuPage& mainPage);
+
+	void pushPage(MenuPage& page);
+	void popPage();
+	MenuPage& peekPage();
+
+	// render the MenuPage at the top
+	void render(SDL_Renderer* renderer, TTF_Font* font);
+
+	// Relay keys to the MenuPage at the top
 	void handleKeys(SDL_Keycode key);
 };
