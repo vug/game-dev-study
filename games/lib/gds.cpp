@@ -4,26 +4,26 @@
 
 namespace gds {
 
-	//------------- Sdl
+//------------- Sdl
 
-	Sdl::Sdl(const std::string& name, int width, int height) : name(name), width(width), height(height) {
-		SDL_Init(SDL_INIT_VIDEO);
-		TTF_Init();
-		window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
-		//SDL_Surface* gScreenSurface = SDL_GetWindowSurface(gWindow);
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	}
+Sdl::Sdl(const std::string& name, int width, int height) : name(name), width(width), height(height) {
+	SDL_Init(SDL_INIT_VIDEO);
+	TTF_Init();
+	window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+	//SDL_Surface* gScreenSurface = SDL_GetWindowSurface(gWindow);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+}
 
-	Sdl::~Sdl() {
-		TTF_Quit();
-		SDL_DestroyRenderer(renderer);
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-	}
+Sdl::~Sdl() {
+	TTF_Quit();
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+}
 
-	void Sdl::renderPresent() const {
-		SDL_RenderPresent(renderer);
-	}
+void Sdl::renderPresent() const {
+	SDL_RenderPresent(renderer);
+}
 
 
 //------------- Font
