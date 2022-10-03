@@ -110,7 +110,7 @@ MenuState::MenuState(StateManager& stateManager)
 				"Controls:"
 				"\nLEFT ARROW turns the snake to the left"
 				"\nRIGHT ARROW turns the snake to the right"
-				"\nP pauses the game", 
+				"\nESC pauses the game", 
 				gds::sdl.getFont(gds::DEFAULT_FONT), { 0xCC, 0x22, 0x33 }, {200, 250});
 		}
 
@@ -241,7 +241,7 @@ State* PlayingState::update(uint32_t deltaTime) {
 	case SDLK_RIGHT:
 		snake.turnRight();
 		break;
-	case SDLK_p:
+	case SDLK_ESCAPE:
 		result = stateManager.pauseState.get();
 		break;
 	case SDLK_UNKNOWN:
@@ -274,7 +274,25 @@ State* PlayingState::update(uint32_t deltaTime) {
 
 //------------- PauseState
 
-PauseState::PauseState(StateManager& stateManager) : State(stateManager) {}
+PauseState::PauseState(StateManager& stateManager) : State(stateManager), pausePage({SIZE / 2, SIZE / 2}), menu(pausePage) {
+	// Resume Button
+	{
+		Button& resumeButton = pausePage.addButton("Resume");
+		auto callback = [&]() {
+			this->nextState = stateManager.playingState.get();
+		};
+		resumeButton.registerCallback(callback);		
+	}
+
+	// Back to main menu Button
+	{
+		Button& mainMenuButton = pausePage.addButton("Main Menu");
+		auto callback = [&]() {
+			this->nextState = stateManager.menuState.get();
+		};
+		mainMenuButton.registerCallback(callback);
+	}
+}
 
 void PauseState::handleEvent(const SDL_Event& e) {
 	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
@@ -283,8 +301,15 @@ void PauseState::handleEvent(const SDL_Event& e) {
 
 State* PauseState::update(uint32_t deltaTime) {
 	State* result = this;
-	if (lastKey == SDLK_p)
-		result = stateManager.playingState.get();
+
+	// TODO: return switchToNextStateIfAny();
+	if (nextState) {
+		result = nextState;
+		nextState = nullptr;
+		return result;
+	}
+
+	menu.handleKeys(lastKey);
 	lastKey = SDLK_UNKNOWN;
 
 	return result;
@@ -302,8 +327,7 @@ void PauseState::render() {
 	SDL_SetRenderDrawBlendMode(gds::sdl.renderer, SDL_BLENDMODE_NONE);
 
 	// Pause rendering specific draw calls
-	TTF_Font* font = gds::sdl.getFont(gds::DEFAULT_FONT).get();
-	gds::renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, font, true);
+	menu.render();
 }
 
 //------------- GameOverState

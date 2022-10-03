@@ -82,7 +82,10 @@ public:
 
 class PauseState : public State {
 private:
+	MenuPage pausePage;
+	Menu menu;
 	SDL_Keycode lastKey{};
+	State* nextState = nullptr;
 
 public:
 	PauseState(StateManager& stateManager);
