@@ -23,6 +23,9 @@ public:
 	void renderPresent() const;
 };
 
+// Global Variable to be set in main function
+extern Sdl sdl;
+
 class Font {
 public: // TODO: make private
 	TTF_Font* sdlFont = nullptr;
@@ -48,7 +51,7 @@ public:
 	void render(const SDL_Point& pos);
 };
 
-void renderText(const std::string& text, SDL_Color color, int x, int y, SDL_Renderer* renderer, TTF_Font* font, bool center = false);
+void renderText(const std::string& text, SDL_Color color, int x, int y, TTF_Font* font, bool center = false);
 
 int positiveModulus(int num, int mod);
 

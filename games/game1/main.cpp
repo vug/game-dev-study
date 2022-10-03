@@ -13,13 +13,14 @@
 
 const int SIZE = 800;
 
+gds::Sdl gds::sdl = gds::Sdl("Snake", SIZE, SIZE);
+
 class Game {
 private:
 	StateManager stateManager;
 	State* state = stateManager.menuState.get();
 public:
 	void run() {
-		gds::Sdl sdl = gds::Sdl("Snake", SIZE, SIZE);
 		const char* fontFile = "assets/fonts/enter_command/EnterCommand.ttf"; // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
 		gds::Font font = gds::Font(fontFile, 28);
 
@@ -40,12 +41,12 @@ public:
 			// State Manager
 			state = state->update(deltaTime);
 
-			SDL_SetRenderDrawColor(sdl.renderer, 0xFF, 0x00, 0xFF, 0xFF);
-			SDL_RenderClear(sdl.renderer);
+			SDL_SetRenderDrawColor(gds::sdl.renderer, 0xFF, 0x00, 0xFF, 0xFF);
+			SDL_RenderClear(gds::sdl.renderer);
 
-			state->render(sdl.renderer, font.sdlFont);
+			state->render(gds::sdl.renderer, font.sdlFont);
 
-			sdl.renderPresent();
+			gds::sdl.renderPresent();
 		}
 	}
 };
