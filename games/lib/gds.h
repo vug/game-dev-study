@@ -8,6 +8,14 @@
 
 namespace gds {
 
+class Result {
+private:
+	int val;
+public:
+	Result(int val);
+	bool assertOK() const;
+};
+
 class Sdl {
 private:
 	std::string name;
@@ -37,16 +45,24 @@ public:
 
 class Texture {
 private:
-	const Sdl& sdl;
 	SDL_Texture* sdlTexture = nullptr;
 	uint32_t format{};
 	int access{};
 	int width{};
 	int height{};
 public:
-	Texture(const Sdl& sdl, const Font& font, const std::string& text, const SDL_Color& color = { 0xFF, 0xFF, 0xFF });
+	Texture() = default;
+	Texture(SDL_Texture* tex);
+	Texture(const Texture& other) = delete;
+	Texture& operator=(const Texture& other) = delete;
+	Texture(Texture&& other) noexcept;
+	Texture& operator=(Texture&& other) noexcept;
+
 	~Texture();
+
+	SDL_Texture* get() const;
 	bool isValid() const;
+	SDL_Point getSize() const;
 
 	void render(const SDL_Point& pos);
 };

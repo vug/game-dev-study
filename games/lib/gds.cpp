@@ -1,8 +1,22 @@
 #include "gds.h"
 
+#include <cassert>
 #include <iostream>
 
 namespace gds {
+
+//------------- Result
+
+Result::Result(int val) : val(val) {}
+
+bool Result::assertOK() const {
+	bool isOK = val == 0;
+	if (!isOK) {
+		std::cerr << SDL_GetError() << "\n";
+		assert(false);
+	}
+	return isOK;
+}
 
 //------------- Sdl
 
@@ -12,6 +26,11 @@ Sdl::Sdl(const std::string& name, int width, int height) : name(name), width(wid
 	window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
 	//SDL_Surface* gScreenSurface = SDL_GetWindowSurface(gWindow);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	// Should be able to render into textures
+	SDL_RendererInfo info{};
+	SDL_GetRendererInfo(renderer, &info);
+	assert(info.flags & SDL_RENDERER_TARGETTEXTURE);
 }
 
 Sdl::~Sdl() {
@@ -46,26 +65,59 @@ bool Font::isValid() const {
 
 //------------- Texture
 
+Texture::Texture(SDL_Texture* tex) : sdlTexture(tex) {
+	SDL_QueryTexture(sdlTexture, &format, &access, &width, &height);
+}
+
+Texture::Texture(Texture&& other) noexcept 
+	: sdlTexture(other.sdlTexture), format(other.format), access(other.access), width(other.width), height(other.height) {
+	other.sdlTexture = nullptr;
+	other.format = {};
+	other.access = {};
+	other.width = {};
+	other.height = {};
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept {
+	if (this == &other) 
+		return *this;
+
+	if (sdlTexture != nullptr)
+		SDL_DestroyTexture(sdlTexture);
+	sdlTexture = other.sdlTexture;
+	format = other.format;
+	access = other.access;
+	width = other.width;
+	height = other.height;
+
+	other.sdlTexture = nullptr;
+	other.format = {};
+	other.access = {};
+	other.width = {};
+	other.height = {};
+	return *this;
+}
+
 Texture::~Texture() {
-	SDL_DestroyTexture(sdlTexture);
+	if (sdlTexture != nullptr)
+		SDL_DestroyTexture(sdlTexture);
+}
+
+SDL_Texture* Texture::get() const {
+	return sdlTexture;
 }
 
 bool Texture::isValid() const {
 	return sdlTexture != nullptr;
 }
 
-Texture::Texture(const Sdl& sdl, const Font& font, const std::string& text, const SDL_Color& color) 
-	: sdl(sdl) {
-
-	SDL_Surface* textSurface = TTF_RenderText_Blended(font.sdlFont, text.c_str(), color); // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs
-	sdlTexture = SDL_CreateTextureFromSurface(sdl.renderer, textSurface);
-	SDL_QueryTexture(sdlTexture, &format, &access, &width, &height);
-	SDL_FreeSurface(textSurface);
+SDL_Point Texture::getSize() const {
+	return { width, height };
 }
 
 void Texture::render(const SDL_Point& pos) {
 	SDL_Rect dstRect{ pos.x, pos.y, width, height };
-	SDL_RenderCopy(sdl.renderer, sdlTexture, NULL, &dstRect);
+	SDL_RenderCopy(gds::sdl.renderer, sdlTexture, NULL, &dstRect);
 }
 
 
