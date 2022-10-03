@@ -35,11 +35,13 @@ public:
 extern Sdl sdl;
 
 class Font {
-public: // TODO: make private
+private:
 	TTF_Font* sdlFont = nullptr;
 public:
 	Font(const char* file, int size, int style = TTF_STYLE_NORMAL);
 	~Font();
+
+	TTF_Font* const get() const;
 	bool isValid() const;
 };
 

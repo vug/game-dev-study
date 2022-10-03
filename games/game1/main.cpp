@@ -44,7 +44,7 @@ public:
 			SDL_SetRenderDrawColor(gds::sdl.renderer, 0xFF, 0x00, 0xFF, 0xFF);
 			SDL_RenderClear(gds::sdl.renderer);
 
-			state->render(gds::sdl.renderer, font.sdlFont);
+			state->render(gds::sdl.renderer, font.get());
 
 			gds::sdl.renderPresent();
 		}

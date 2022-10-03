@@ -58,6 +58,10 @@ Font::~Font() {
 	TTF_CloseFont(sdlFont);
 }
 
+TTF_Font* const Font::get() const {
+	return sdlFont;
+}
+
 bool Font::isValid() const {
 	return sdlFont != nullptr;
 }
