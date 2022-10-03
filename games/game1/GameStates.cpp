@@ -125,9 +125,12 @@ void MenuState::render() {
 	const int leftMargin = 15;
 	const int lineHeight = 25;
 	gds::renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, 200, font, true);
-	gds::renderText("LEFT ARROW turns the snake to the left", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 3, font);
-	gds::renderText("RIGHT ARROW turns the snake to the right", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 2, font);
-	gds::renderText("P pauses the game", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 1, font);
+
+	gds::renderText(
+		"LEFT ARROW turns the snake to the left"
+		"\nRIGHT ARROW turns the snake to the right"
+		"\nP pauses the game", 
+		{ 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 3, font);
 }
 
 
