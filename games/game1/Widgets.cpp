@@ -85,7 +85,7 @@ gds::TextTexture& MenuPage::addTextTexture(const std::string& text, gds::Font& f
 	return tt;
 }
 
-void MenuPage::render(SDL_Renderer* renderer, TTF_Font* font) {
+void MenuPage::render() {
 	for (int ix = 0; ix < textures.size(); ++ix) {
 		textures[ix].render(texturePositions[ix]);
 	}
@@ -94,8 +94,8 @@ void MenuPage::render(SDL_Renderer* renderer, TTF_Font* font) {
 		w->render();
 	auto selectionIndicator = SDL_Rect{ pos.x - 2 * LINE_HEIGHT, pos.y + selectionIx * LINE_HEIGHT, LINE_HEIGHT, LINE_HEIGHT };
 
-	SDL_SetRenderDrawColor(renderer, 0xCC, 0x22, 0x33, 0xFF);
-	SDL_RenderFillRect(renderer, &selectionIndicator);
+	SDL_SetRenderDrawColor(gds::sdl.renderer, 0xCC, 0x22, 0x33, 0xFF);
+	SDL_RenderFillRect(gds::sdl.renderer, &selectionIndicator);
 }
 
 void MenuPage::handleKeys(SDL_Keycode key) {
@@ -135,8 +135,8 @@ MenuPage& Menu::peekPage() {
 	return pages.top();
 }
 
-void Menu::render(SDL_Renderer* renderer, TTF_Font* font) {
-	peekPage().render(renderer, font);
+void Menu::render() {
+	peekPage().render();
 }
 
 void Menu::handleKeys(SDL_Keycode key) {

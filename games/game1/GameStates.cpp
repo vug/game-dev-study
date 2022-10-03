@@ -151,11 +151,11 @@ void MenuState::render() {
 	SDL_SetRenderDrawColor(gds::sdl.renderer, 0x88, 0x88, 0x88, 0xFF);
 	SDL_RenderClear(gds::sdl.renderer);
 
-	TTF_Font* font = gds::sdl.getFont(gds::DEFAULT_FONT).get();
-	menu.render(gds::sdl.renderer, font);
+	menu.render();
 
 	const int leftMargin = 15;
 	const int lineHeight = 25;
+	TTF_Font* font = gds::sdl.getFont(gds::DEFAULT_FONT).get();
 	gds::renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, 200, font, true);
 }
 

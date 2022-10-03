@@ -70,7 +70,7 @@ public:
 	gds::TextTexture& addTextTexture(const std::string& text, gds::Font& font, const SDL_Color& color, const SDL_Point& pos);
 
 	// render every widget
-	void render(SDL_Renderer* renderer, TTF_Font* font);
+	void render();
 
 	// up/down for selecting widgets, enter to trigger them
 	void handleKeys(SDL_Keycode key);
@@ -89,7 +89,7 @@ public:
 	MenuPage& peekPage();
 
 	// render the MenuPage at the top
-	void render(SDL_Renderer* renderer, TTF_Font* font);
+	void render();
 
 	// Relay keys to the MenuPage at the top
 	void handleKeys(SDL_Keycode key);
