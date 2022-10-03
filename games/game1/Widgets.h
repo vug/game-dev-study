@@ -16,7 +16,7 @@ protected:
 	SDL_Point pos{};
 public:
 
-	virtual void render(SDL_Renderer* renderer, TTF_Font* font) = 0;
+	virtual void render() = 0;
 
 	virtual void trigger() = 0;
 
@@ -30,7 +30,7 @@ private:
 public:
 	Button(const std::string& text);
 
-	void render(SDL_Renderer* renderer, TTF_Font* font) final;
+	void render() final;
 	void trigger() final;
 
 	void registerCallback(std::function<void()> func);
@@ -46,7 +46,7 @@ private:
 public:
 	Selector(const std::string& label, const std::vector<std::string> options);
 
-	void render(SDL_Renderer* renderer, TTF_Font* font) final;
+	void render() final;
 	void trigger() final;
 
 	const std::string& getSelection() const;

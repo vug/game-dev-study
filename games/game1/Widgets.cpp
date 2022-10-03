@@ -14,7 +14,7 @@ void Widget::setPosition(const SDL_Point& p) {
 //------------- Button
 
 Button::Button(const std::string& text) : textTex(text, gds::sdl.getFont(gds::DEFAULT_FONT), SDL_Color{ 0xCC, 0x22, 0x33 }) {}
-void Button::render(SDL_Renderer* renderer, TTF_Font* font) {
+void Button::render() {
 	textTex.render(pos);
 }
 
@@ -35,7 +35,7 @@ Selector::Selector(const std::string& label, const std::vector<std::string> opti
 	}
 }
 
-void Selector::render(SDL_Renderer* renderer, TTF_Font* font) {
+void Selector::render() {
 	textTexes[selectionIx].render(pos);
 }
 
@@ -79,7 +79,7 @@ Selector& MenuPage::addSelector(const std::string& label, const std::vector<std:
 
 void MenuPage::render(SDL_Renderer* renderer, TTF_Font* font) {
 	for (auto& w : widgets)
-		w->render(renderer, font);
+		w->render();
 	auto selectionIndicator = SDL_Rect{ pos.x - 2 * LINE_HEIGHT, pos.y + selectionIx * LINE_HEIGHT, LINE_HEIGHT, LINE_HEIGHT };
 
 	SDL_SetRenderDrawColor(renderer, 0xCC, 0x22, 0x33, 0xFF);
