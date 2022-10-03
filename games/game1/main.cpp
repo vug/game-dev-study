@@ -21,8 +21,7 @@ private:
 	State* state = stateManager.menuState.get();
 public:
 	void run() {
-		const char* fontFile = "assets/fonts/enter_command/EnterCommand.ttf"; // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
-		gds::Font font = gds::Font(fontFile, 28);
+		gds::sdl.loadFont("DEFAULT", "assets/fonts/enter_command/EnterCommand.ttf", 28); // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
 
 		SDL_Event e;
 		bool quit = false;
@@ -44,7 +43,7 @@ public:
 			SDL_SetRenderDrawColor(gds::sdl.renderer, 0xFF, 0x00, 0xFF, 0xFF);
 			SDL_RenderClear(gds::sdl.renderer);
 
-			state->render(gds::sdl.renderer, font.get());
+			state->render(gds::sdl.renderer, gds::sdl.getFont("DEFAULT").get());
 
 			gds::sdl.renderPresent();
 		}

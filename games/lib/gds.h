@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace gds {
 
@@ -16,11 +17,14 @@ public:
 	bool assertOK() const;
 };
 
+class Font;
+
 class Sdl {
 private:
 	std::string name;
 	int width{};
 	int height{};
+	std::unordered_map<std::string, Font> fonts;
 public:
 	SDL_Renderer* renderer;
 	SDL_Window* window;
@@ -28,6 +32,8 @@ public:
 	Sdl(const std::string& name, int width, int height);
 	~Sdl();
 
+	Font& loadFont(const std::string& name, const char* file, int size, int style = TTF_STYLE_NORMAL);
+	const Font& getFont(const std::string& name) const;
 	void renderPresent() const;
 };
 

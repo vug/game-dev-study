@@ -34,10 +34,27 @@ Sdl::Sdl(const std::string& name, int width, int height) : name(name), width(wid
 }
 
 Sdl::~Sdl() {
+	// Since Sdl has unordered_map fonts as a member, which owns the fonts. Members are destroyed after the destructor call.
+	// But ~Font() calls TTF_CloseFont(), which needs to be called before TTF_Quit() (otherwise it throws). So, delete loaded fonts before TTF_Quit().
+	fonts.clear();
 	TTF_Quit();
+
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+}
+
+Font& Sdl::loadFont(const std::string& name, const char* file, int size, int style) {
+	assert(!fonts.contains(name)); // can't emplace a font with the same name
+	//auto [it, hasEmplaced] = fonts.emplace(name, Font{ file, size, style });
+	auto [it, hasEmplaced] = fonts.try_emplace(name, file, size, style );
+	assert(hasEmplaced);
+	return it->second;
+}
+
+const Font& Sdl::getFont(const std::string& name) const {
+	assert(fonts.contains(name)); // don't get a font that's not loaded
+	return fonts.at(name);
 }
 
 void Sdl::renderPresent() const {
@@ -55,7 +72,8 @@ Font::Font(const char* file, int size, int style) {
 }
 
 Font::~Font() {
-	TTF_CloseFont(sdlFont);
+	if (sdlFont != nullptr)
+		TTF_CloseFont(sdlFont);
 }
 
 TTF_Font* const Font::get() const {
