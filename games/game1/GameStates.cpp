@@ -115,18 +115,19 @@ State* MenuState::update(uint32_t deltaTime) {
 	return result;
 }
 
-void MenuState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
-	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
-	SDL_RenderClear(gRenderer);
+void MenuState::render() {
+	SDL_SetRenderDrawColor(gds::sdl.renderer, 0x88, 0x88, 0x88, 0xFF);
+	SDL_RenderClear(gds::sdl.renderer);
 
-	menu.render(gRenderer, gFont);
+	TTF_Font* font = gds::sdl.getFont(gds::DEFAULT_FONT).get();
+	menu.render(gds::sdl.renderer, font);
 
 	const int leftMargin = 15;
 	const int lineHeight = 25;
-	gds::renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, 200, gFont, true);
-	gds::renderText("LEFT ARROW turns the snake to the left", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 3, gFont);
-	gds::renderText("RIGHT ARROW turns the snake to the right", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 2, gFont);
-	gds::renderText("P pauses the game", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 1, gFont);
+	gds::renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, 200, font, true);
+	gds::renderText("LEFT ARROW turns the snake to the left", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 3, font);
+	gds::renderText("RIGHT ARROW turns the snake to the right", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 2, font);
+	gds::renderText("P pauses the game", { 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 1, font);
 }
 
 
@@ -168,30 +169,31 @@ void PlayingState::restart() {
 	placeApple();
 }
 
-void PlayingState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
+void PlayingState::render() {
 	// Clear
-	SDL_SetRenderDrawColor(gRenderer, 0x88, 0x88, 0x88, 0xFF);
-	SDL_RenderClear(gRenderer);
+	SDL_SetRenderDrawColor(gds::sdl.renderer, 0x88, 0x88, 0x88, 0xFF);
+	SDL_RenderClear(gds::sdl.renderer);
 
 	// Render Game Area
 	const float rectSide = static_cast<float>(SIZE) / gridSize;
 
 	{
-		SDL_SetRenderDrawColor(gRenderer, 0xAA, 0x00, 0x00, 0xFF);
+		SDL_SetRenderDrawColor(gds::sdl.renderer, 0xAA, 0x00, 0x00, 0xFF);
 		const SDL_FRect rect = { apple.x * rectSide, apple.y * rectSide, rectSide, rectSide };
-		SDL_RenderFillRectF(gRenderer, &rect);
+		SDL_RenderFillRectF(gds::sdl.renderer, &rect);
 	}
 
-	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
+	SDL_SetRenderDrawColor(gds::sdl.renderer, 0x00, 0x00, 0x00, 0xFF);
 	for (const Cell& cell : snake.getCells()) {
 		const SDL_FRect rect = { cell.x * rectSide, cell.y * rectSide, rectSide, rectSide };
-		SDL_RenderFillRectF(gRenderer, &rect);
+		SDL_RenderFillRectF(gds::sdl.renderer, &rect);
 	}
 
 	// Render texts such as score
 	{
+		TTF_Font* font = gds::sdl.getFont(gds::DEFAULT_FONT).get();
 		std::string text = "score: " + std::to_string(score);
-		gds::renderText(text, { 0xCC, 0xCC, 0xCC }, 0, 0, gFont);
+		gds::renderText(text, { 0xCC, 0xCC, 0xCC }, 0, 0, font);
 	}
 }
 
@@ -259,19 +261,20 @@ State* PauseState::update(uint32_t deltaTime) {
 	return result;
 }
 
-void PauseState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
+void PauseState::render() {
 	// Render game area without evolving it
-	stateManager.playingState->render(gRenderer, gFont);
+	stateManager.playingState->render();
 
 	// Draw a semi-transparent fullscreen quad overlay
-	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0x55);
-	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(gds::sdl.renderer, 0x00, 0x00, 0x00, 0x55);
+	SDL_SetRenderDrawBlendMode(gds::sdl.renderer, SDL_BLENDMODE_BLEND);
 	const SDL_Rect rect = { 0, 0, SIZE, SIZE};
-	SDL_RenderFillRect(gRenderer, &rect);
-	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
+	SDL_RenderFillRect(gds::sdl.renderer, &rect);
+	SDL_SetRenderDrawBlendMode(gds::sdl.renderer, SDL_BLENDMODE_NONE);
 
 	// Pause rendering specific draw calls
-	gds::renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gFont, true);
+	TTF_Font* font = gds::sdl.getFont(gds::DEFAULT_FONT).get();
+	gds::renderText("Paused...", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, font, true);
 }
 
 //------------- GameOverState
@@ -298,21 +301,22 @@ State* GameOverState::update(uint32_t deltaTime) {
 	return result;
 }
 
-void GameOverState::render(SDL_Renderer* gRenderer, TTF_Font* gFont) {
+void GameOverState::render() {
 	// Render game area without evolving it
-	stateManager.playingState->render(gRenderer, gFont);
+	stateManager.playingState->render();
 
 	// Draw a semi-transparent fullscreen quad overlay
-	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0x99);
-	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(gds::sdl.renderer, 0x00, 0x00, 0x00, 0x99);
+	SDL_SetRenderDrawBlendMode(gds::sdl.renderer, SDL_BLENDMODE_BLEND);
 	const SDL_Rect rect = { 0, 0, SIZE, SIZE };
-	SDL_RenderFillRect(gRenderer, &rect);
-	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
+	SDL_RenderFillRect(gds::sdl.renderer, &rect);
+	SDL_SetRenderDrawBlendMode(gds::sdl.renderer, SDL_BLENDMODE_NONE);
 
 	// GameOver rendering specific draw calls
-	gds::renderText("Game Over", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, gFont, true);
-	gds::renderText(gameOverReason.c_str(), {0xCC, 0x22, 0x33}, SIZE / 2, SIZE / 2 + 30, gFont, true);
-	gds::renderText("Press SPACE to return to main menu", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, gFont, true);
+	TTF_Font* font = gds::sdl.getFont(gds::DEFAULT_FONT).get();
+	gds::renderText("Game Over", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, font, true);
+	gds::renderText(gameOverReason.c_str(), {0xCC, 0x22, 0x33}, SIZE / 2, SIZE / 2 + 30, font, true);
+	gds::renderText("Press SPACE to return to main menu", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, font, true);
 
 }
 

@@ -39,6 +39,7 @@ public:
 
 // Global Variable to be set in main function
 extern Sdl sdl;
+const std::string DEFAULT_FONT = "DEFAULT";
 
 class Font {
 private:
