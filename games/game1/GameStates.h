@@ -42,6 +42,7 @@ private:
 	SDL_Keycode lastKey{};
 	MenuPage mainPage;
 	MenuPage settingsPage;
+	MenuPage helpPage;
 	Menu menu;
 	State* nextState = nullptr;
 

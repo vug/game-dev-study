@@ -14,7 +14,7 @@ const int SIZE = 800;
 //------------- MenuState
 
 MenuState::MenuState(StateManager& stateManager) 
-	: State(stateManager), mainPage({SIZE / 2, SIZE / 2}), settingsPage({ SIZE / 2, SIZE / 2 }), menu(mainPage) {
+	: State(stateManager), mainPage({SIZE / 2, SIZE / 2}), settingsPage({ SIZE / 2, SIZE / 2 }), helpPage({ SIZE / 2, SIZE / 2 }), menu(mainPage) {
 
 	// Main Page
 	{
@@ -35,6 +35,14 @@ MenuState::MenuState(StateManager& stateManager)
 	}
 
 	{
+		Button& helpButton = mainPage.addButton("Help");
+		auto callback = [&]() {
+			menu.pushPage(helpPage);
+		};
+		helpButton.registerCallback(callback);
+	}
+
+	{
 		Button& exitButton = mainPage.addButton("Exit");
 		auto callback = [&]() {
 			SDL_Event exit{};
@@ -48,48 +56,72 @@ MenuState::MenuState(StateManager& stateManager)
 	// Settings Page
 	{
 		// Grid Size
-		static const std::string SMALL = "Small";
-		static const std::string MEDIUM = "Medium";
-		static const std::string LARGE = "Large";
-		Selector& sizeSelector = settingsPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE });
-		auto callback = [&]() {
-			int32_t& size = stateManager.playingState->gridSize;
-			const std::string& selected = sizeSelector.getSelection();
-			if (selected == SMALL)
-				size = 10;
-			else if (selected == MEDIUM)
-				size = 20;
-			else if (selected == LARGE)
-				size = 40;
-		};
-		sizeSelector.registerCallback(callback);
-	}
+		{
+			static const std::string SMALL = "Small";
+			static const std::string MEDIUM = "Medium";
+			static const std::string LARGE = "Large";
+			Selector& sizeSelector = settingsPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE });
+			auto callback = [&]() {
+				int32_t& size = stateManager.playingState->gridSize;
+				const std::string& selected = sizeSelector.getSelection();
+				if (selected == SMALL)
+					size = 10;
+				else if (selected == MEDIUM)
+					size = 20;
+				else if (selected == LARGE)
+					size = 40;
+			};
+			sizeSelector.registerCallback(callback);
+		}
 
-	{
 		// Speed
-		static const std::string SLOW = "Slow";
-		static const std::string MEDIUM = "Medium";
-		static const std::string FAST = "Fast";
-		Selector& speedSelector = settingsPage.addSelector("Speed", { SLOW, MEDIUM, FAST });
-		auto callback = [&]() {
-			int32_t& period = stateManager.playingState->period;
-			const std::string& selected = speedSelector.getSelection();
-			if (selected == SLOW)
-				period = 400;
-			else if (selected == MEDIUM)
-				period = 200;
-			else if (selected == FAST)
-				period = 100;
-		};
-		speedSelector.registerCallback(callback);
+		{
+			static const std::string SLOW = "Slow";
+			static const std::string MEDIUM = "Medium";
+			static const std::string FAST = "Fast";
+			Selector& speedSelector = settingsPage.addSelector("Speed", { SLOW, MEDIUM, FAST });
+			auto callback = [&]() {
+				int32_t& period = stateManager.playingState->period;
+				const std::string& selected = speedSelector.getSelection();
+				if (selected == SLOW)
+					period = 400;
+				else if (selected == MEDIUM)
+					period = 200;
+				else if (selected == FAST)
+					period = 100;
+			};
+			speedSelector.registerCallback(callback);
+		}
+
+		{
+			Button& backButton = settingsPage.addButton("Back");
+			auto callback = [&]() {
+				menu.popPage();
+			};
+			backButton.registerCallback(callback);
+		}
 	}
 
+	// Help Page
 	{
-		Button& backButton = settingsPage.addButton("Back");
-		auto callback = [&]() {
-			menu.popPage();
-		};
-		backButton.registerCallback(callback);
+		// Help Text
+		{
+			helpPage.addTextTexture(
+				"Controls:"
+				"\nLEFT ARROW turns the snake to the left"
+				"\nRIGHT ARROW turns the snake to the right"
+				"\nP pauses the game", 
+				gds::sdl.getFont(gds::DEFAULT_FONT), { 0xCC, 0x22, 0x33 }, {200, 250});
+		}
+
+		// Back Button
+		{
+			Button& backButton = helpPage.addButton("Back");
+			auto callback = [&]() {
+				menu.popPage();
+			};
+			backButton.registerCallback(callback);
+		}
 	}
 
 	menu.pushPage(mainPage);
@@ -125,12 +157,6 @@ void MenuState::render() {
 	const int leftMargin = 15;
 	const int lineHeight = 25;
 	gds::renderText("Hungry Snake", { 0xCC, 0x22, 0x33 }, SIZE / 2, 200, font, true);
-
-	gds::renderText(
-		"LEFT ARROW turns the snake to the left"
-		"\nRIGHT ARROW turns the snake to the right"
-		"\nP pauses the game", 
-		{ 0xCC, 0x22, 0x33 }, leftMargin, SIZE - lineHeight * 3, font);
 }
 
 
