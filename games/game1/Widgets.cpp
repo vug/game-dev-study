@@ -77,7 +77,19 @@ Selector& MenuPage::addSelector(const std::string& label, const std::vector<std:
 	return w;
 }
 
+gds::TextTexture& MenuPage::addTextTexture(const std::string& text, gds::Font& font, const SDL_Color& color, const SDL_Point& pos) {
+	textures.emplace_back(gds::TextTexture{ text, font, color });
+	texturePositions.push_back(pos);
+
+	gds::TextTexture& tt = static_cast<gds::TextTexture&>(textures.back());
+	return tt;
+}
+
 void MenuPage::render(SDL_Renderer* renderer, TTF_Font* font) {
+	for (int ix = 0; ix < textures.size(); ++ix) {
+		textures[ix].render(texturePositions[ix]);
+	}
+
 	for (auto& w : widgets)
 		w->render();
 	auto selectionIndicator = SDL_Rect{ pos.x - 2 * LINE_HEIGHT, pos.y + selectionIx * LINE_HEIGHT, LINE_HEIGHT, LINE_HEIGHT };

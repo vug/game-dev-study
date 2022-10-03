@@ -56,6 +56,8 @@ public:
 class MenuPage {
 private:
 	std::vector<std::unique_ptr<Widget>> widgets;
+	std::vector<gds::Texture> textures;
+	std::vector<SDL_Point> texturePositions;
 	int32_t selectionIx = 0;
 	SDL_Point pos;
 	SDL_Point cursor = {0 ,0};
@@ -65,6 +67,7 @@ public:
 
 	Button& addButton(const std::string& text);
 	Selector& addSelector(const std::string& label, const std::vector<std::string> options);
+	gds::TextTexture& addTextTexture(const std::string& text, gds::Font& font, const SDL_Color& color, const SDL_Point& pos);
 
 	// render every widget
 	void render(SDL_Renderer* renderer, TTF_Font* font);
