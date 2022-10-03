@@ -21,8 +21,6 @@ private:
 	State* state = stateManager.menuState.get();
 public:
 	void run() {
-		gds::sdl.loadFont(gds::DEFAULT_FONT, "assets/fonts/enter_command/EnterCommand.ttf", 28); // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
-
 		SDL_Event e;
 		bool quit = false;
 
@@ -51,6 +49,8 @@ public:
 };
 
 int main(int argc, char* args[]) {
+	gds::sdl.loadFont(gds::DEFAULT_FONT, "assets/fonts/enter_command/EnterCommand.ttf", 28); // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
+
 	Game game;
 	game.run();
 	return 0;

@@ -13,9 +13,9 @@ void Widget::setPosition(const SDL_Point& p) {
 
 //------------- Button
 
-Button::Button(const std::string& text) : text(text) {}
+Button::Button(const std::string& text) : textTex(text, gds::sdl.getFont(gds::DEFAULT_FONT), SDL_Color{ 0xCC, 0x22, 0x33 }) {}
 void Button::render(SDL_Renderer* renderer, TTF_Font* font) {
-	gds::renderText(text, { 0xCC, 0x22, 0x33 }, pos.x, pos.y, font, false);
+	textTex.render(pos);
 }
 
 void Button::trigger() {
@@ -29,10 +29,14 @@ void Button::registerCallback(std::function<void()> func) {
 //------------- Selector
 
 Selector::Selector(const std::string& label, const std::vector<std::string> options) 
-	: label(label), options(options) {}
+	: label(label), options(options) {
+	for (const auto& opt : options) {
+		textTexes.emplace_back(label + ": " + opt, gds::sdl.getFont(gds::DEFAULT_FONT), SDL_Color{ 0xCC, 0x22, 0x33 });
+	}
+}
 
 void Selector::render(SDL_Renderer* renderer, TTF_Font* font) {
-	gds::renderText(label + ": " + options[selectionIx], {0xCC, 0x22, 0x33}, pos.x, pos.y, font, false);
+	textTexes[selectionIx].render(pos);
 }
 
 void Selector::trigger() {

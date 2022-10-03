@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gds.h>
+
 #include <SDL.h>
 #include <SDL_ttf.h>
 
@@ -23,7 +25,7 @@ public:
 
 class Button : public Widget {
 private:
-	std::string text;
+	gds::TextTexture textTex;
 	std::function<void()> callback;
 public:
 	Button(const std::string& text);
@@ -40,6 +42,7 @@ private:
 	std::vector<std::string> options;
 	int32_t selectionIx = 0;
 	std::function<void()> callback;
+	std::vector<gds::TextTexture> textTexes;
 public:
 	Selector(const std::string& label, const std::vector<std::string> options);
 
