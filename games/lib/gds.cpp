@@ -52,7 +52,7 @@ Font& Sdl::loadFont(const std::string& name, const char* file, int size, int sty
 	return it->second;
 }
 
-const Font& Sdl::getFont(const std::string& name) const {
+Font& Sdl::getFont(const std::string& name) {
 	assert(fonts.contains(name)); // don't get a font that's not loaded
 	return fonts.at(name);
 }
@@ -142,6 +142,27 @@ void Texture::render(const SDL_Point& pos) {
 	SDL_RenderCopy(gds::sdl.renderer, sdlTexture, NULL, &dstRect);
 }
 
+
+//------------- TextTexture
+
+SDL_Texture* TextTexture::makeTexture(const std::string& text, const Font& font, const SDL_Color& color) {
+	SDL_Surface* textSurface = TTF_RenderText_Blended(font.get(), text.c_str(), color);   // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs
+	if (textSurface == nullptr)
+		std::cerr << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError() << "\n";
+	return SDL_CreateTextureFromSurface(gds::sdl.renderer, textSurface);
+}
+
+TextTexture::TextTexture(const std::string& text, Font& font, const SDL_Color& color)
+	: text(text), font(font), color(color), Texture(makeTexture(text, font, color)) {}
+
+void TextTexture::setText(const std::string & text) {
+	this->text = text;
+	sdlTexture = makeTexture(text, font, color);
+	SDL_QueryTexture(sdlTexture, &format, &access, &width, &height);
+}
+
+
+//-------------
 
 void renderText(const std::string& text, SDL_Color color, int x, int y, TTF_Font* font, bool center) {
 	SDL_Surface* textSurface = TTF_RenderText_Blended(font, text.c_str(), color);   // anti-aliased glyphs, TTF_RenderText_Solid() for aliased glyphs

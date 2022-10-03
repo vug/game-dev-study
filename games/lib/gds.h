@@ -33,7 +33,7 @@ public:
 	~Sdl();
 
 	Font& loadFont(const std::string& name, const char* file, int size, int style = TTF_STYLE_NORMAL);
-	const Font& getFont(const std::string& name) const;
+	Font& getFont(const std::string& name);
 	void renderPresent() const;
 };
 
@@ -53,15 +53,17 @@ public:
 };
 
 class Texture {
-private:
+protected:
 	SDL_Texture* sdlTexture = nullptr;
 	uint32_t format{};
 	int access{};
 	int width{};
 	int height{};
-public:
-	Texture() = default;
+
+protected:
 	Texture(SDL_Texture* tex);
+
+public:
 	Texture(const Texture& other) = delete;
 	Texture& operator=(const Texture& other) = delete;
 	Texture(Texture&& other) noexcept;
@@ -74,6 +76,19 @@ public:
 	SDL_Point getSize() const;
 
 	void render(const SDL_Point& pos);
+};
+
+class TextTexture : public Texture {
+private:
+	std::string text;
+	Font& font;
+	SDL_Color color;
+private:
+	static SDL_Texture* makeTexture(const std::string& text, const Font& font, const SDL_Color& color);
+public:
+	TextTexture(const std::string& text, Font& font, const SDL_Color& color);
+
+	void setText(const std::string& text);
 };
 
 void renderText(const std::string& text, SDL_Color color, int x, int y, TTF_Font* font, bool center = false);
