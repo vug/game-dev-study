@@ -14,7 +14,7 @@ const int SIZE = 800;
 //------------- MenuState
 
 MenuState::MenuState(StateManager& stateManager) 
-	: State(stateManager), mainPage({SIZE / 2, SIZE / 2}), settingsPage({ SIZE / 2, SIZE / 2 }), helpPage({ SIZE / 2, SIZE / 2 }), menu(mainPage) {
+	: State(stateManager), mainPage({SIZE / 2 - 50, SIZE / 2}), settingsPage({ SIZE / 2 - 50, SIZE / 2 }), helpPage({ SIZE / 2 - 50, SIZE / 2 }), menu(mainPage) {
 
 	// Main Page
 	{
