@@ -99,7 +99,7 @@ public:
 
 class GameOverState : public State {
 private:
-	SDL_Keycode lastKey{};
+	SDL_Keycode lastKey = SDLK_UNKNOWN;
 	std::string gameOverReason = "NO REASON GIVEN";
 
 public:

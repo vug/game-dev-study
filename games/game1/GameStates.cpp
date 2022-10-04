@@ -345,7 +345,7 @@ void GameOverState::handleEvent(const SDL_Event& e) {
 
 State* GameOverState::update(uint32_t deltaTime) {
 	State* result = this;
-	if (lastKey == SDLK_SPACE) {
+	if (lastKey != SDLK_UNKNOWN) {
 		result = stateManager.menuState.get();
 		stateManager.playingState->restart();
 	}
@@ -369,7 +369,7 @@ void GameOverState::render() {
 	TTF_Font* font = gds::sdl.getFont(gds::DEFAULT_FONT).get();
 	gds::renderText("Game Over", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE / 2, font, true);
 	gds::renderText(gameOverReason.c_str(), {0xCC, 0x22, 0x33}, SIZE / 2, SIZE / 2 + 30, font, true);
-	gds::renderText("Press SPACE to return to main menu", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, font, true);
+	gds::renderText("Press any key to return to main menu", { 0xCC, 0x22, 0x33 }, SIZE / 2, SIZE - 30, font, true);
 
 }
 
