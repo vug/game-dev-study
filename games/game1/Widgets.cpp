@@ -28,8 +28,8 @@ void Button::registerCallback(std::function<void()> func) {
 
 //------------- Selector
 
-Selector::Selector(const std::string& label, const std::vector<std::string> options) 
-	: label(label), options(options) {
+Selector::Selector(const std::string& label, const std::vector<std::string> options, int32_t initialIx)
+	: label(label), options(options), selectionIx(initialIx) {
 	for (const auto& opt : options) {
 		textTexes.emplace_back(label + ": " + opt, gds::sdl.getFont(gds::DEFAULT_FONT), SDL_Color{ 0xCC, 0x22, 0x33 });
 	}
@@ -67,8 +67,8 @@ Button& MenuPage::addButton(const std::string& text) {
 	return w;
 }
 
-Selector& MenuPage::addSelector(const std::string& label, const std::vector<std::string> options) {
-	widgets.push_back(std::make_unique<Selector>(label, options));
+Selector& MenuPage::addSelector(const std::string& label, const std::vector<std::string> options, int32_t initialIx) {
+	widgets.push_back(std::make_unique<Selector>(label, options, initialIx));
 
 	Selector& w = static_cast<Selector&>(*widgets.back());
 	w.setPosition(gds::addPoints(pos, cursor));

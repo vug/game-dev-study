@@ -44,7 +44,7 @@ private:
 	std::function<void()> callback;
 	std::vector<gds::TextTexture> textTexes;
 public:
-	Selector(const std::string& label, const std::vector<std::string> options);
+	Selector(const std::string& label, const std::vector<std::string> options, int32_t initialIx = 0);
 
 	void render() final;
 	void trigger() final;
@@ -66,7 +66,7 @@ public:
 	MenuPage(const SDL_Point& pos);
 
 	Button& addButton(const std::string& text);
-	Selector& addSelector(const std::string& label, const std::vector<std::string> options);
+	Selector& addSelector(const std::string& label, const std::vector<std::string> options, int32_t initialIx = 0);
 	gds::TextTexture& addTextTexture(const std::string& text, gds::Font& font, const SDL_Color& color, const SDL_Point& pos);
 
 	// render every widget
