@@ -60,7 +60,7 @@ MenuState::MenuState(StateManager& stateManager)
 			static const std::string SMALL = "Small";
 			static const std::string MEDIUM = "Medium";
 			static const std::string LARGE = "Large";
-			Selector& sizeSelector = settingsPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE });
+			Selector& sizeSelector = settingsPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE }, 1);
 			auto callback = [&]() {
 				int32_t& size = stateManager.playingState->gridSize;
 				const std::string& selected = sizeSelector.getSelection();
@@ -79,7 +79,7 @@ MenuState::MenuState(StateManager& stateManager)
 			static const std::string SLOW = "Slow";
 			static const std::string MEDIUM = "Medium";
 			static const std::string FAST = "Fast";
-			Selector& speedSelector = settingsPage.addSelector("Speed", { SLOW, MEDIUM, FAST });
+			Selector& speedSelector = settingsPage.addSelector("Speed", { SLOW, MEDIUM, FAST }, 1);
 			auto callback = [&]() {
 				int32_t& period = stateManager.playingState->period;
 				const std::string& selected = speedSelector.getSelection();
