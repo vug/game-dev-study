@@ -238,8 +238,9 @@ State* PlayingState::update(uint32_t deltaTime) {
 		snake.turnRight();
 		break;
 	case SDLK_ESCAPE:
+		lastKey = SDLK_UNKNOWN;
 		result = stateManager.pauseState.get();
-		break;
+		return result;
 	case SDLK_UNKNOWN:
 		break;
 	}
