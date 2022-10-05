@@ -1,6 +1,7 @@
 set(LIB gds)
 add_library(${LIB} STATIC
   gds.cpp gds.h
+  Widgets.cpp Widgets.h
 )
 
 target_include_directories(${LIB} PUBLIC .)

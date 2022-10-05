@@ -1,7 +1,6 @@
 set(GAME Snake)
 add_executable(${GAME}
   main.cpp
-  Widgets.cpp Widgets.h
   Snake.cpp Snake.h
   GameStates.cpp GameStates.h
 )
