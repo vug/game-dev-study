@@ -11,4 +11,4 @@ include(dependencies/SDL2_ttf-2.20.1/cmake/sdl2_ttf-config.cmake)
 include(dependencies/SDL2_ttf-2.20.1/cmake/sdl2_ttf-config-version.cmake)
 
 add_subdirectory(games/lib)
-add_subdirectory(games/game1)
+add_subdirectory(games/01-snake)
