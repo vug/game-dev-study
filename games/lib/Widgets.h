@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+namespace gds {
+
 class Widget {
 protected:
 	SDL_Point pos{};
@@ -94,3 +96,5 @@ public:
 	// Relay keys to the MenuPage at the top
 	void handleKeys(SDL_Keycode key);
 };
+
+}

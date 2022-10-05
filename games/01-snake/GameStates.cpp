@@ -1,8 +1,7 @@
 #include "GameStates.h"
 
+#include <gds.h>
 #include "Widgets.h"
-
-#include "gds.h"
 
 #include <algorithm>
 #include <iostream>
@@ -18,7 +17,7 @@ MenuState::MenuState(StateManager& stateManager)
 
 	// Main Page
 	{
-		Button& startButton = mainPage.addButton("Start");
+		gds::Button& startButton = mainPage.addButton("Start");
 		auto callback = [&]() { 
 			stateManager.playingState->restart();
 			this->nextState = stateManager.playingState.get();
@@ -27,7 +26,7 @@ MenuState::MenuState(StateManager& stateManager)
 	}
 
 	{
-		Button& settingsButton = mainPage.addButton("Settings");
+		gds::Button& settingsButton = mainPage.addButton("Settings");
 		auto callback = [&]() {
 			menu.pushPage(settingsPage);
 		};
@@ -35,7 +34,7 @@ MenuState::MenuState(StateManager& stateManager)
 	}
 
 	{
-		Button& helpButton = mainPage.addButton("Help");
+		gds::Button& helpButton = mainPage.addButton("Help");
 		auto callback = [&]() {
 			menu.pushPage(helpPage);
 		};
@@ -43,7 +42,7 @@ MenuState::MenuState(StateManager& stateManager)
 	}
 
 	{
-		Button& exitButton = mainPage.addButton("Exit");
+		gds::Button& exitButton = mainPage.addButton("Exit");
 		auto callback = [&]() {
 			SDL_Event exit{};
 			exit.type = SDL_QUIT;
@@ -60,7 +59,7 @@ MenuState::MenuState(StateManager& stateManager)
 			static const std::string SMALL = "Small";
 			static const std::string MEDIUM = "Medium";
 			static const std::string LARGE = "Large";
-			Selector& sizeSelector = settingsPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE }, 1);
+			gds::Selector& sizeSelector = settingsPage.addSelector("Area Size", { SMALL, MEDIUM, LARGE }, 1);
 			auto callback = [&]() {
 				int32_t& size = stateManager.playingState->gridSize;
 				const std::string& selected = sizeSelector.getSelection();
@@ -79,7 +78,7 @@ MenuState::MenuState(StateManager& stateManager)
 			static const std::string SLOW = "Slow";
 			static const std::string MEDIUM = "Medium";
 			static const std::string FAST = "Fast";
-			Selector& speedSelector = settingsPage.addSelector("Speed", { SLOW, MEDIUM, FAST }, 1);
+			gds::Selector& speedSelector = settingsPage.addSelector("Speed", { SLOW, MEDIUM, FAST }, 1);
 			auto callback = [&]() {
 				int32_t& period = stateManager.playingState->period;
 				const std::string& selected = speedSelector.getSelection();
@@ -94,7 +93,7 @@ MenuState::MenuState(StateManager& stateManager)
 		}
 
 		{
-			Button& backButton = settingsPage.addButton("Back");
+			gds::Button& backButton = settingsPage.addButton("Back");
 			auto callback = [&]() {
 				menu.popPage();
 			};
@@ -116,7 +115,7 @@ MenuState::MenuState(StateManager& stateManager)
 
 		// Back Button
 		{
-			Button& backButton = helpPage.addButton("Back");
+			gds::Button& backButton = helpPage.addButton("Back");
 			auto callback = [&]() {
 				menu.popPage();
 			};
@@ -274,7 +273,7 @@ State* PlayingState::update(uint32_t deltaTime) {
 PauseState::PauseState(StateManager& stateManager) : State(stateManager), pausePage({SIZE / 2, SIZE / 2}), menu(pausePage) {
 	// Resume Button
 	{
-		Button& resumeButton = pausePage.addButton("Resume");
+		gds::Button& resumeButton = pausePage.addButton("Resume");
 		auto callback = [&]() {
 			this->nextState = stateManager.playingState.get();
 		};
@@ -283,7 +282,7 @@ PauseState::PauseState(StateManager& stateManager) : State(stateManager), pauseP
 
 	// Back to main menu Button
 	{
-		Button& mainMenuButton = pausePage.addButton("Main Menu");
+		gds::Button& mainMenuButton = pausePage.addButton("Main Menu");
 		auto callback = [&]() {
 			this->nextState = stateManager.menuState.get();
 		};

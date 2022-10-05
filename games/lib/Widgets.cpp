@@ -4,6 +4,8 @@
 
 #include <cassert>
 
+namespace gds {
+
 //------------- Widget
 
 void Widget::setPosition(const SDL_Point& p) {
@@ -141,4 +143,6 @@ void Menu::render() {
 
 void Menu::handleKeys(SDL_Keycode key) {
 	peekPage().handleKeys(key);
+}
+
 }

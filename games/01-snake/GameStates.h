@@ -2,7 +2,8 @@
 
 #include "Cell.h"
 #include "Snake.h"
-#include "Widgets.h"
+
+#include <Widgets.h>
 
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -40,10 +41,10 @@ public:
 class MenuState : public State {
 private:
 	SDL_Keycode lastKey{};
-	MenuPage mainPage;
-	MenuPage settingsPage;
-	MenuPage helpPage;
-	Menu menu;
+	gds::MenuPage mainPage;
+	gds::MenuPage settingsPage;
+	gds::MenuPage helpPage;
+	gds::Menu menu;
 	State* nextState = nullptr;
 
 public:
@@ -82,8 +83,8 @@ public:
 
 class PauseState : public State {
 private:
-	MenuPage pausePage;
-	Menu menu;
+	gds::MenuPage pausePage;
+	gds::Menu menu;
 	SDL_Keycode lastKey{};
 	State* nextState = nullptr;
 
