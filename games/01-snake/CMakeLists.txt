@@ -1,6 +1,10 @@
 set(GAME Snake)
 add_executable(${GAME}
-  Snake.cpp GameStates.cpp Widgets.cpp main.cpp)
+  main.cpp
+  Widgets.cpp Widgets.h
+  Snake.cpp Snake.h
+  GameStates.cpp GameStates.h
+)
 
 target_link_libraries(${GAME} PRIVATE
   gds
