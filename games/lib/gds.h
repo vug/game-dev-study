@@ -40,6 +40,7 @@ public:
 // Global Variable to be set in main function
 extern Sdl sdl;
 const std::string DEFAULT_FONT = "DEFAULT";
+const std::string TITLE_FONT = "TITLE";
 
 class Font {
 private:
@@ -91,6 +92,7 @@ public:
 	void setText(const std::string& text);
 };
 
+// Creates, renders and destroys a new texture every call
 void renderText(const std::string& text, SDL_Color color, int x, int y, TTF_Font* font, bool center = false);
 
 int positiveModulus(int num, int mod);

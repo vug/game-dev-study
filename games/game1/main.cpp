@@ -50,6 +50,7 @@ public:
 
 int main(int argc, char* args[]) {
 	gds::sdl.loadFont(gds::DEFAULT_FONT, "assets/fonts/enter_command/EnterCommand.ttf", 28); // "c:\\Windows\\Fonts\\vgaoem.fon"; // arial.ttf"
+	gds::sdl.loadFont(gds::TITLE_FONT, "assets/fonts/enter_command/EnterCommand.ttf", 40);
 
 	Game game;
 	game.run();
