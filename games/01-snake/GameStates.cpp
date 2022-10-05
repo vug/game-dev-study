@@ -293,6 +293,8 @@ PauseState::PauseState(StateManager& stateManager) : State(stateManager), pauseP
 void PauseState::handleEvent(const SDL_Event& e) {
 	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
 		lastKey = e.key.keysym.sym;
+	if (lastKey == SDLK_ESCAPE)
+		nextState = stateManager.playingState.get();
 }
 
 State* PauseState::update(uint32_t deltaTime) {
