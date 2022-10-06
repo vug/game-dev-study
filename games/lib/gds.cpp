@@ -157,6 +157,7 @@ TextTexture::TextTexture(const std::string& text, Font& font, const SDL_Color& c
 
 void TextTexture::setText(const std::string & text) {
 	this->text = text;
+	SDL_DestroyTexture(sdlTexture);
 	sdlTexture = makeTexture(text, font, color);
 	SDL_QueryTexture(sdlTexture, &format, &access, &width, &height);
 }
